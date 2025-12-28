@@ -11,11 +11,13 @@ var embeddedData embed.FS
 
 // Command represents a command with its metadata
 type Command struct {
-	Title       string
-	Tags        []string
-	Keywords    string
-	Description string
-	Code        string
+	Title            string
+	Tags             []string
+	Keywords         string
+	ShortDescription string
+	LongDescription  string
+	Description      string // Deprecated: use ShortDescription
+	Code             string
 }
 
 // LoadCommands loads all commands from embedded markdown files for a specific language
@@ -111,6 +113,18 @@ func processLine(line string, cmd *Command, codeLines *[]string, inCodeBlock boo
 		return inCodeBlock
 	}
 
+	if strings.HasPrefix(line, "**Short_Description**:") {
+		cmd.ShortDescription = strings.TrimSpace(strings.TrimPrefix(line, "**Short_Description**:"))
+		// Also set Description for backward compatibility
+		cmd.Description = cmd.ShortDescription
+		return inCodeBlock
+	}
+
+	if strings.HasPrefix(line, "**Long_Description**:") {
+		cmd.LongDescription = strings.TrimSpace(strings.TrimPrefix(line, "**Long_Description**:"))
+		return inCodeBlock
+	}
+
 	if strings.HasPrefix(line, "```") {
 		return !inCodeBlock
 	}
@@ -118,17 +132,14 @@ func processLine(line string, cmd *Command, codeLines *[]string, inCodeBlock boo
 	if inCodeBlock {
 		*codeLines = append(*codeLines, line)
 	} else if line != "" && !strings.HasPrefix(line, "**") {
-		appendDescription(cmd, line)
+		// Fallback: if no Short_Description specified, use first line as description
+		if cmd.ShortDescription == "" && cmd.Description == "" {
+			cmd.Description = line
+			cmd.ShortDescription = line
+		}
 	}
 
 	return inCodeBlock
-}
-
-func appendDescription(cmd *Command, text string) {
-	if cmd.Description != "" {
-		cmd.Description += " "
-	}
-	cmd.Description += text
 }
 
 // parseTags divide la stringa di tag in slice

@@ -227,14 +227,16 @@ nano ~/.redfish/en/mycommands.md
 ## command name
 **Tags**: tag1, tag2, tag3
 **Keywords**: keyword1 keyword2 keyword3
-
-Command description
+**Short_Description**: Brief one-line description
+**Long_Description**: Detailed explanation of what the command does, when to use it, and any important details.
 
 \`\`\`sh
 command example
 another example
 \`\`\`
 ```
+
+**Note**: `Short_Description` and `Long_Description` are optional but recommended. If omitted, the first text line after keywords will be used as the description.
 
 3. Your commands are immediately available:
 

@@ -45,43 +45,66 @@ var synonymsIT = map[string][]string{
 
 // ExpandWithSynonyms expands tokens with their synonyms
 func ExpandWithSynonyms(tokens []string, lang string) []string {
-	synonyms := synonymsEN
-	if lang == "it" {
-		synonyms = synonymsIT
-	}
-
+	synonyms := getSynonymMap(lang)
 	expanded := make([]string, 0, len(tokens)*2)
 
 	for _, token := range tokens {
-		// Add original token
 		expanded = append(expanded, token)
+		expanded = append(expanded, expandToken(token, synonyms)...)
+	}
 
-		// Check if token matches any base word or its synonyms
-		for baseWord, variants := range synonyms {
-			// Check if token is the base word
-			if token == baseWord {
-				expanded = append(expanded, variants...)
-				break
-			}
+	return uniqueTokens(expanded)
+}
 
-			// Check if token is one of the variants
-			for _, variant := range variants {
-				if token == variant {
-					// Add base word and all other variants
-					expanded = append(expanded, baseWord)
-					for _, v := range variants {
-						if v != variant {
-							expanded = append(expanded, v)
-						}
-					}
-					break
-				}
-			}
+// getSynonymMap returns the appropriate synonym map for the language
+func getSynonymMap(lang string) map[string][]string {
+	if lang == "it" {
+		return synonymsIT
+	}
+	return synonymsEN
+}
+
+// expandToken expands a single token with its synonyms
+func expandToken(token string, synonyms map[string][]string) []string {
+	var result []string
+
+	// Check if token is a base word
+	if variants, found := synonyms[token]; found {
+		result = append(result, variants...)
+		return result
+	}
+
+	// Check if token is a variant
+	for baseWord, variants := range synonyms {
+		if containsString(variants, token) {
+			result = append(result, baseWord)
+			result = append(result, filterOutString(variants, token)...)
+			return result
 		}
 	}
 
-	// Remove duplicates
-	return uniqueTokens(expanded)
+	return result
+}
+
+// containsString checks if a slice contains a string
+func containsString(slice []string, str string) bool {
+	for _, s := range slice {
+		if s == str {
+			return true
+		}
+	}
+	return false
+}
+
+// filterOutString returns slice without the specified string
+func filterOutString(slice []string, exclude string) []string {
+	result := make([]string, 0, len(slice))
+	for _, s := range slice {
+		if s != exclude {
+			result = append(result, s)
+		}
+	}
+	return result
 }
 
 // uniqueTokens removes duplicate tokens
@@ -100,7 +123,7 @@ func uniqueTokens(tokens []string) []string {
 }
 
 // NormalizeVerb tries to normalize Italian/English verb forms to base form
-func NormalizeVerb(word string, lang string) string {
+func NormalizeVerb(word, lang string) string {
 	word = strings.ToLower(word)
 
 	if lang == "it" {

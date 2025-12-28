@@ -3,8 +3,8 @@
 ## git pull
 **Tags**: git, version-control, sync, remote, fetch
 **Keywords**: pull fetch remote update sync download
-
-Fetch and merge changes from remote repository
+**Short_Description**: Fetch and merge changes from remote repository
+**Long_Description**: Downloads commits, files, and refs from a remote repository and immediately integrates them into the current branch. This is essentially a combination of git fetch followed by git merge.
 
 ```sh
 git pull origin main
@@ -13,8 +13,8 @@ git pull origin main
 ## git push
 **Tags**: git, version-control, sync, remote, upload
 **Keywords**: push remote upload sync send publish
-
-Push local commits to remote repository
+**Short_Description**: Push local commits to remote repository
+**Long_Description**: Uploads local repository content to a remote repository. After you've accumulated several local commits and are ready to share them with other team members, you can push them to the remote repository.
 
 ```sh
 git push origin main

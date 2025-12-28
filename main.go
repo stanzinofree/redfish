@@ -26,72 +26,121 @@ var (
 )
 
 func main() {
-	// Parse flags
 	flag.Parse()
 
-	// Initialize cache directory on first run
+	selectedLang := initializeAndGetLanguage()
+	
+	if handleCommandFlags(selectedLang) {
+		return
+	}
+
+	query := getQueryFromArgs()
+	executeSearch(query, selectedLang)
+}
+
+// initializeAndGetLanguage initializes the app and returns the selected language
+func initializeAndGetLanguage() string {
 	if err := cache.EnsureCacheDir(); err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: could not initialize cache directory: %v\n", err)
 	}
 
-	// Load configuration
+	cfg := loadConfigOrDefault()
+	return determineLanguage(cfg)
+}
+
+// loadConfigOrDefault loads config or returns default
+func loadConfigOrDefault() config.Config {
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: could not load config: %v\n", err)
-		cfg = config.GetDefaultConfig()
+		return config.GetDefaultConfig()
 	}
+	return cfg
+}
 
-	// Determine language to use (flag overrides config)
-	selectedLang := cfg.Language
+// determineLanguage determines language from config and flags
+func determineLanguage(cfg config.Config) string {
 	if *language != "" {
-		selectedLang = *language
+		return *language
 	}
+	return cfg.Language
+}
 
-	// Handle flags
+// handleCommandFlags handles special command flags, returns true if app should exit
+func handleCommandFlags(selectedLang string) bool {
 	if *showHelp {
 		printHelp()
 		os.Exit(0)
+		return true
 	}
 
 	if *showVersion {
 		fmt.Println(version.GetVersionInfo())
 		os.Exit(0)
+		return true
 	}
 
 	if *showConfig {
-		if err := config.RunWizard(); err != nil {
-			fmt.Fprintf(os.Stderr, "Error running configuration wizard: %v\n", err)
-			os.Exit(1)
-		}
-		os.Exit(0)
+		handleConfigWizard()
+		return true
 	}
 
 	if *reloadCache {
-		if err := rebuildCache(selectedLang); err != nil {
-			fmt.Fprintf(os.Stderr, "Error rebuilding cache: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Println("✓ Cache rebuilt successfully")
-		os.Exit(0)
+		handleCacheReload(selectedLang)
+		return true
 	}
 
-	// Get query from remaining arguments
+	return false
+}
+
+// handleConfigWizard runs the configuration wizard
+func handleConfigWizard() {
+	if err := config.RunWizard(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error running configuration wizard: %v\n", err)
+		os.Exit(1)
+	}
+	os.Exit(0)
+}
+
+// handleCacheReload rebuilds the cache
+func handleCacheReload(selectedLang string) {
+	if err := rebuildCache(selectedLang); err != nil {
+		fmt.Fprintf(os.Stderr, "Error rebuilding cache: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Println("✓ Cache rebuilt successfully")
+	os.Exit(0)
+}
+
+// getQueryFromArgs gets search query from command line arguments
+func getQueryFromArgs() string {
 	args := flag.Args()
 	if len(args) == 0 {
 		printUsage()
 		os.Exit(1)
 	}
+	return strings.Join(args, " ")
+}
 
-	query := strings.Join(args, " ")
+// executeSearch performs the search and renders results
+func executeSearch(query, selectedLang string) {
+	commands := loadCommandsOrExit(selectedLang)
+	results := searchAndFilter(commands, query, selectedLang)
+	renderResults(results)
+}
 
-	// Load commands (embedded + cached custom)
+// loadCommandsOrExit loads commands or exits on error
+func loadCommandsOrExit(selectedLang string) []parser.Command {
 	commands, err := loadAllCommands(selectedLang)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error loading commands: %v\n", err)
 		os.Exit(1)
 	}
+	return commands
+}
 
-	// Search with language-aware stopword filtering
+// searchAndFilter performs search and filters results
+func searchAndFilter(commands []parser.Command, query, selectedLang string) []search.Result {
 	results := search.SearchWithLanguage(commands, query, selectedLang)
 
 	if len(results) == 0 {
@@ -100,34 +149,47 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Smart output: limit results for specific searches
-	results = limitResultsIfSpecific(results, query)
+	return limitResultsIfSpecific(results, query)
+}
 
-	// Use fzf for interactive selection if requested
-	if *useFzf || *useShortFzf {
-		if !fzf.IsAvailable() {
-			fmt.Fprintln(os.Stderr, "Error: fzf is not installed")
-			fmt.Fprintln(os.Stderr, "Install it with: brew install fzf (macOS) or apt install fzf (Linux)")
-			os.Exit(1)
-		}
-
-		selected, err := fzf.SelectCommand(results)
-		if err != nil {
-			// User cancelled or error
-			os.Exit(0)
-		}
-
-		// Render only the selected command
-		if err := render.RenderResults([]search.Result{*selected}); err != nil {
-			fmt.Fprintf(os.Stderr, "Error rendering result: %v\n", err)
-			os.Exit(1)
-		}
+// renderResults renders search results with optional fzf
+func renderResults(results []search.Result) {
+	if shouldUseFzf() {
+		renderWithFzf(results)
 	} else {
-		// Render all results
-		if err := render.RenderResults(results); err != nil {
-			fmt.Fprintf(os.Stderr, "Error rendering results: %v\n", err)
-			os.Exit(1)
-		}
+		renderDirect(results)
+	}
+}
+
+// shouldUseFzf checks if fzf mode should be used
+func shouldUseFzf() bool {
+	return *useFzf || *useShortFzf
+}
+
+// renderWithFzf renders results using fzf interactive mode
+func renderWithFzf(results []search.Result) {
+	if !fzf.IsAvailable() {
+		fmt.Fprintln(os.Stderr, "Error: fzf is not installed")
+		fmt.Fprintln(os.Stderr, "Install it with: brew install fzf (macOS) or apt install fzf (Linux)")
+		os.Exit(1)
+	}
+
+	selected, err := fzf.SelectCommand(results)
+	if err != nil {
+		os.Exit(0)
+	}
+
+	if err := render.RenderResults([]search.Result{*selected}); err != nil {
+		fmt.Fprintf(os.Stderr, "Error rendering result: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+// renderDirect renders all results directly
+func renderDirect(results []search.Result) {
+	if err := render.RenderResults(results); err != nil {
+		fmt.Fprintf(os.Stderr, "Error rendering results: %v\n", err)
+		os.Exit(1)
 	}
 }
 
