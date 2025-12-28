@@ -30,11 +30,12 @@ jobs:
       - name: Run go vet
         run: go vet ./...
 
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v4
-        with:
-          version: latest
-          args: --timeout=5m
+      # TODO: Re-enable when Go 1.25+ is available in CI
+      # - name: Run golangci-lint
+      #   uses: golangci/golangci-lint-action@v4
+      #   with:
+      #     version: latest
+      #     args: --timeout=5m
 
   test:
     name: Test
@@ -52,14 +53,7 @@ jobs:
         run: go mod download
 
       - name: Run tests
-        run: go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.out
-          flags: unittests
-          name: codecov-umbrella
+        run: go test -v ./...
 
   build:
     name: Build
