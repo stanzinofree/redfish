@@ -48,27 +48,17 @@ func LoadCommands() ([]Command, error) {
 func parseMarkdown(content string) []Command {
 	var commands []Command
 	var current *Command
+	var codeLines []string
+	inCodeBlock := false
 
 	scanner := bufio.NewScanner(strings.NewReader(content))
-	inCodeBlock := false
-	var codeLines []string
-
 	for scanner.Scan() {
 		line := scanner.Text()
 		trimmed := strings.TrimSpace(line)
 
-		// Header H2 = new command
-		if strings.HasPrefix(trimmed, "## ") {
-			// Save previous command if exists
-			if current != nil {
-				current.Code = strings.Join(codeLines, "\n")
-				commands = append(commands, *current)
-			}
-
-			// Start new command
-			current = &Command{
-				Title: strings.TrimPrefix(trimmed, "## "),
-			}
+		if isNewCommandHeader(trimmed) {
+			current = saveAndStartNewCommand(current, codeLines, &commands)
+			current.Title = strings.TrimPrefix(trimmed, "## ")
 			codeLines = []string{}
 			continue
 		}
@@ -77,42 +67,58 @@ func parseMarkdown(content string) []Command {
 			continue
 		}
 
-		// Parse metadata
-		if strings.HasPrefix(trimmed, "**Tags**:") {
-			tagsStr := strings.TrimSpace(strings.TrimPrefix(trimmed, "**Tags**:"))
-			current.Tags = parseTags(tagsStr)
-			continue
-		}
-
-		if strings.HasPrefix(trimmed, "**Keywords**:") {
-			current.Keywords = strings.TrimSpace(strings.TrimPrefix(trimmed, "**Keywords**:"))
-			continue
-		}
-
-		// Code blocks
-		if strings.HasPrefix(trimmed, "```") {
-			inCodeBlock = !inCodeBlock
-			continue
-		}
-
-		if inCodeBlock {
-			codeLines = append(codeLines, trimmed)
-		} else if trimmed != "" && !strings.HasPrefix(trimmed, "**") {
-			// Description
-			if current.Description != "" {
-				current.Description += " "
-			}
-			current.Description += trimmed
-		}
+		inCodeBlock = processLine(trimmed, current, &codeLines, inCodeBlock)
 	}
 
-	// Save last command
-	if current != nil {
-		current.Code = strings.Join(codeLines, "\n")
-		commands = append(commands, *current)
-	}
-
+	saveCommand(current, codeLines, &commands)
 	return commands
+}
+
+func isNewCommandHeader(line string) bool {
+	return strings.HasPrefix(line, "## ")
+}
+
+func saveAndStartNewCommand(current *Command, codeLines []string, commands *[]Command) *Command {
+	saveCommand(current, codeLines, commands)
+	return &Command{}
+}
+
+func saveCommand(cmd *Command, codeLines []string, commands *[]Command) {
+	if cmd != nil {
+		cmd.Code = strings.Join(codeLines, "\n")
+		*commands = append(*commands, *cmd)
+	}
+}
+
+func processLine(line string, cmd *Command, codeLines *[]string, inCodeBlock bool) bool {
+	if strings.HasPrefix(line, "**Tags**:") {
+		cmd.Tags = parseTags(strings.TrimPrefix(line, "**Tags**:"))
+		return inCodeBlock
+	}
+
+	if strings.HasPrefix(line, "**Keywords**:") {
+		cmd.Keywords = strings.TrimSpace(strings.TrimPrefix(line, "**Keywords**:"))
+		return inCodeBlock
+	}
+
+	if strings.HasPrefix(line, "```") {
+		return !inCodeBlock
+	}
+
+	if inCodeBlock {
+		*codeLines = append(*codeLines, line)
+	} else if line != "" && !strings.HasPrefix(line, "**") {
+		appendDescription(cmd, line)
+	}
+
+	return inCodeBlock
+}
+
+func appendDescription(cmd *Command, text string) {
+	if cmd.Description != "" {
+		cmd.Description += " "
+	}
+	cmd.Description += text
 }
 
 // parseTags divide la stringa di tag in slice

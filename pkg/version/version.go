@@ -1,7 +1,7 @@
 package version
 
 import (
-	_ "embed"
+	_ "embed" // Required for go:embed directive to work
 	"fmt"
 	"runtime"
 	"strings"
