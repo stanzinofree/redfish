@@ -9,19 +9,22 @@ import (
 )
 
 const (
-	configFile      = "config.yaml"
-	defaultLanguage = "en"
+	configFile            = "config.yaml"
+	defaultLanguage       = "en"
+	defaultDescriptionMode = "short"
 )
 
 // Config represents user preferences
 type Config struct {
-	Language string `yaml:"language"`
+	Language        string `yaml:"language"`
+	DescriptionMode string `yaml:"description_mode"` // "short", "long", or "none"
 }
 
 // GetDefaultConfig returns the default configuration
 func GetDefaultConfig() Config {
 	return Config{
-		Language: defaultLanguage,
+		Language:        defaultLanguage,
+		DescriptionMode: defaultDescriptionMode,
 	}
 }
 

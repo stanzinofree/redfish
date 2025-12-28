@@ -3,8 +3,8 @@
 ## markdown headers
 **Tags**: markdown, headers, headings, title, h1, h2, h3
 **Keywords**: headers headings title h1 h2 h3 h4 h5 h6
-
-Create headers
+**Short_Description**: Create headers
+**Long_Description**: Defines document structure with six heading levels using hash symbols. H1 is the largest and most important, H6 is the smallest. Number of hashes (1-6) determines heading level. Essential for organizing content hierarchy and improving document readability.
 
 ```markdown
 # H1 Header
@@ -18,8 +18,8 @@ Create headers
 ## markdown emphasis
 **Tags**: markdown, emphasis, bold, italic, formatting
 **Keywords**: emphasis bold italic strong formatting text style
-
-Text formatting
+**Short_Description**: Text formatting
+**Long_Description**: Applies text styling using asterisks or underscores. Single asterisk/underscore for italic, double for bold, triple for both. Tildes create strikethrough, backticks create inline code. Combines for rich text formatting without HTML.
 
 ```markdown
 **bold text**
@@ -32,8 +32,8 @@ Text formatting
 ## markdown lists
 **Tags**: markdown, lists, ordered, unordered, bullets
 **Keywords**: lists ordered unordered bullets numbered items
-
-Create lists
+**Short_Description**: Create lists
+**Long_Description**: Creates structured lists using hyphens/asterisks for bullets or numbers for ordered lists. Supports nesting with indentation. Task lists use brackets with x for completed items. Essential for organizing information and creating checklists.
 
 ```markdown
 # Unordered list
@@ -56,8 +56,8 @@ Create lists
 ## markdown links
 **Tags**: markdown, links, hyperlinks, urls, references
 **Keywords**: links hyperlinks urls references href anchor
-
-Create links
+**Short_Description**: Create links
+**Long_Description**: Creates clickable hyperlinks with text and URL. Supports inline links, reference-style links for reuse, and auto-links for plain URLs. Optional title attribute appears on hover. Reference style keeps document clean when same link appears multiple times.
 
 ```markdown
 [Link text](https://example.com)
@@ -75,8 +75,8 @@ Create links
 ## markdown images
 **Tags**: markdown, images, pictures, media, graphics
 **Keywords**: images pictures media graphics photos embed
-
-Embed images
+**Short_Description**: Embed images
+**Long_Description**: Embeds images using syntax similar to links with preceding exclamation mark. Alt text describes image for accessibility. Supports inline and reference-style syntax. Can wrap in link to make image clickable. Title attribute optional.
 
 ```markdown
 ![Alt text](image.jpg)
@@ -93,8 +93,8 @@ Embed images
 ## markdown code blocks
 **Tags**: markdown, code, syntax, highlighting, fenced, blocks
 **Keywords**: code syntax highlighting fenced blocks backticks triple
-
-Code blocks with syntax highlighting
+**Short_Description**: Code blocks with syntax highlighting
+**Long_Description**: Creates fenced code blocks using triple backticks with optional language identifier for syntax highlighting. Supports hundreds of languages including JavaScript, Python, Go, Bash, etc. Essential for technical documentation and sharing code snippets.
 
 ````markdown
 ```javascript
@@ -116,8 +116,8 @@ echo "Hello, World!"
 ## markdown blockquotes
 **Tags**: markdown, blockquotes, quotes, citation
 **Keywords**: blockquotes quotes citation reference indented
-
-Create blockquotes
+**Short_Description**: Create blockquotes
+**Long_Description**: Creates quoted text blocks using greater-than symbol. Supports multi-line quotes, multiple paragraphs, and nesting with additional symbols. Commonly used for citations, callouts, or emphasizing important information. Can contain other markdown formatting.
 
 ```markdown
 > This is a blockquote
@@ -134,8 +134,8 @@ Create blockquotes
 ## markdown tables
 **Tags**: markdown, tables, grid, data, tabular
 **Keywords**: tables grid data tabular rows columns alignment
-
-Create tables
+**Short_Description**: Create tables
+**Long_Description**: Creates data tables using pipes and hyphens. Header row separated by alignment row with hyphens. Colons control alignment: left (default), center (:---:), or right (---:). Essential for presenting structured data in readable format.
 
 ```markdown
 | Header 1 | Header 2 | Header 3 |
@@ -152,8 +152,8 @@ Create tables
 ## markdown horizontal rule
 **Tags**: markdown, horizontal, rule, separator, divider, line
 **Keywords**: horizontal rule separator divider line hr break
-
-Create horizontal rules
+**Short_Description**: Create horizontal rules
+**Long_Description**: Creates visual separators using three or more hyphens, asterisks, or underscores. Creates horizontal line spanning document width. Useful for breaking up sections, separating content, or creating visual hierarchy in long documents.
 
 ```markdown
 ---
@@ -164,8 +164,8 @@ ___
 ## markdown footnotes
 **Tags**: markdown, footnotes, references, citations, notes
 **Keywords**: footnotes references citations notes superscript
-
-Add footnotes
+**Short_Description**: Add footnotes
+**Long_Description**: Creates footnotes with numbered references in text and definitions at bottom. Uses bracket-caret-number syntax for reference, same syntax with colon for definition. Supports multiple references to same footnote. Useful for citations and additional context.
 
 ```markdown
 Here's a sentence with a footnote[^1].
@@ -180,8 +180,8 @@ Multiple references[^note] to the same note[^note].
 ## markdown definition lists
 **Tags**: markdown, definition, lists, terms, glossary
 **Keywords**: definition lists terms glossary dictionary
-
-Create definition lists
+**Short_Description**: Create definition lists
+**Long_Description**: Creates glossary-style lists with terms and definitions. Term on one line, definition on next line starting with colon and space. Supports multiple definitions per term. Ideal for glossaries, documentation, and FAQs.
 
 ```markdown
 Term 1
@@ -195,8 +195,8 @@ Term 2
 ## markdown html
 **Tags**: markdown, html, raw, inline, embedded
 **Keywords**: html raw inline embedded tags elements
-
-Embed raw HTML
+**Short_Description**: Embed raw HTML
+**Long_Description**: Allows embedding raw HTML for features not available in Markdown. Supports inline and block-level HTML elements. Useful for custom styling, interactive elements like details/summary, or keyboard shortcuts. Most Markdown processors allow HTML passthrough.
 
 ```markdown
 <div style="color: red;">
@@ -214,8 +214,8 @@ Embed raw HTML
 ## markdown escaping
 **Tags**: markdown, escape, special, characters, backslash
 **Keywords**: escape special characters backslash literal symbols
-
-Escape special characters
+**Short_Description**: Escape special characters
+**Long_Description**: Uses backslash to display special Markdown characters literally without triggering formatting. Essential when you need to show actual asterisks, brackets, or other syntax characters. Allows writing about Markdown syntax in Markdown documents.
 
 ```markdown
 \* Not a bullet point
@@ -232,8 +232,8 @@ Use backslash \ before:
 ## markdown github extensions
 **Tags**: markdown, github, gfm, extensions, flavored
 **Keywords**: github gfm extensions flavored syntax special
-
-GitHub Flavored Markdown features
+**Short_Description**: GitHub Flavored Markdown features
+**Long_Description**: GitHub-specific Markdown extensions including task lists, @mentions, issue references (#123), emoji shortcodes, and alert callouts. GFM also includes table support and automatic URL linking. These features work on GitHub but may not work in all Markdown processors.
 
 ```markdown
 # Task lists

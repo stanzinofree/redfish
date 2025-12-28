@@ -30,6 +30,7 @@ func RunWizard() error {
 	// Language selection
 	newCfg := Config{}
 	newCfg.Language = promptLanguage(reader, currentCfg.Language)
+	newCfg.DescriptionMode = promptDescriptionMode(reader, currentCfg.DescriptionMode)
 
 	// Validate configuration
 	if err := ValidateConfig(newCfg); err != nil {
@@ -46,6 +47,7 @@ func RunWizard() error {
 	fmt.Println()
 	fmt.Println("Current settings:")
 	fmt.Printf("  Language: %s\n", newCfg.Language)
+	fmt.Printf("  Description Mode: %s\n", newCfg.DescriptionMode)
 	fmt.Println()
 
 	configPath, _ := GetConfigPath()
@@ -83,6 +85,47 @@ func promptLanguage(reader *bufio.Reader, current string) string {
 
 	// Validate input
 	if input != "en" && input != "it" {
+		fmt.Printf("Invalid choice '%s', keeping current value: %s\n", input, current)
+		return current
+	}
+
+	return input
+}
+
+func promptDescriptionMode(reader *bufio.Reader, current string) string {
+	fmt.Println()
+	fmt.Println("─────────────────────────────────────────")
+	fmt.Println("2. Description Display Mode")
+	fmt.Println("─────────────────────────────────────────")
+	fmt.Println()
+	fmt.Println("Choose how to display command descriptions:")
+	fmt.Println("  [short] Brief one-line summary (recommended)")
+	fmt.Println("  [long]  Detailed explanation with context")
+	fmt.Println("  [none]  Hide descriptions")
+	fmt.Println()
+	if current == "" {
+		current = "short"
+	}
+	fmt.Printf("Current: %s\n", current)
+	fmt.Println()
+	fmt.Print("Enter your choice [short/long/none]: ")
+
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf("Error reading input, keeping current value: %s\n", current)
+		return current
+	}
+
+	input = strings.TrimSpace(strings.ToLower(input))
+
+	// If empty, keep current
+	if input == "" {
+		fmt.Printf("Keeping current value: %s\n", current)
+		return current
+	}
+
+	// Validate input
+	if input != "short" && input != "long" && input != "none" {
 		fmt.Printf("Invalid choice '%s', keeping current value: %s\n", input, current)
 		return current
 	}

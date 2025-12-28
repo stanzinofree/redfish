@@ -57,7 +57,14 @@
                 <div class="command-card">
                     <h3>Run Config Wizard</h3>
                     <code>redfish -c</code>
-                    <p>Interactive wizard to set default language</p>
+                    <p>Interactive wizard to set default language and description mode</p>
+                </div>
+                <div class="command-card">
+                    <h3>Description Display</h3>
+                    <code>redfish -d short git pull</code>
+                    <code>redfish -d long git pull</code>
+                    <code>redfish -d none git pull</code>
+                    <p>Choose between short, long, or no descriptions</p>
                 </div>
                 <div class="command-card">
                     <h3>Show Version</h3>
@@ -91,8 +98,9 @@
                 <h3>Add Your Own</h3>
                 <p>Create <code>~/.redfish/{lang}/*.md</code> files with your custom commands</p>
                 <code>mkdir -p ~/.redfish/en<br>echo "# My Commands..." > ~/.redfish/en/myapp.md</code>
-                <p style="margin-top: 1rem;">Format:</p>
-                <code>## command name<br>**Tags**: tag1, tag2<br>**Keywords**: keyword1 keyword2<br><br>Description<br><br>```sh<br>command example<br>```</code>
+                <p style="margin-top: 1rem;">Enhanced Format (with descriptions):</p>
+                <code>## command name<br>**Tags**: tag1, tag2<br>**Keywords**: keyword1 keyword2<br>**Short_Description**: Brief one-line summary<br>**Long_Description**: Detailed explanation<br><br>```sh<br>command example<br>```</code>
+                <p style="margin-top: 1rem; font-size: 0.9em; color: #666;">Note: Short_Description and Long_Description are optional. The old format (plain description) still works.</p>
             </div>
         </div>
 

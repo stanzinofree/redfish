@@ -10,7 +10,7 @@ import (
 )
 
 // RenderResults renderizza i risultati usando Glow/Glamour
-func RenderResults(results []search.Result) error {
+func RenderResults(results []search.Result, descMode string) error {
 	// Crea renderer Glamour con tema dark
 	r, err := glamour.NewTermRenderer(
 		glamour.WithAutoStyle(),
@@ -28,7 +28,7 @@ func RenderResults(results []search.Result) error {
 
 	for i, result := range results {
 		// Format each command as markdown
-		md := formatCommandAsMarkdown(result.Command, i+1)
+		md := formatCommandAsMarkdown(result.Command, i+1, descMode)
 		output.WriteString(md)
 
 		// Separatore tra comandi
@@ -48,7 +48,7 @@ func RenderResults(results []search.Result) error {
 }
 
 // formatCommandAsMarkdown converts a command to formatted markdown
-func formatCommandAsMarkdown(cmd parser.Command, index int) string {
+func formatCommandAsMarkdown(cmd parser.Command, index int, descMode string) string {
 	var md strings.Builder
 
 	// Titolo con numero
@@ -61,10 +61,38 @@ func formatCommandAsMarkdown(cmd parser.Command, index int) string {
 		md.WriteString("\n\n")
 	}
 
-	// Description
-	if cmd.Description != "" {
-		md.WriteString(cmd.Description)
-		md.WriteString("\n\n")
+	// Description based on mode
+	switch descMode {
+	case "short":
+		if cmd.ShortDescription != "" {
+			md.WriteString(cmd.ShortDescription)
+			md.WriteString("\n\n")
+		} else if cmd.Description != "" {
+			md.WriteString(cmd.Description)
+			md.WriteString("\n\n")
+		}
+	case "long":
+		if cmd.LongDescription != "" {
+			md.WriteString(cmd.LongDescription)
+			md.WriteString("\n\n")
+		} else if cmd.ShortDescription != "" {
+			md.WriteString(cmd.ShortDescription)
+			md.WriteString("\n\n")
+		} else if cmd.Description != "" {
+			md.WriteString(cmd.Description)
+			md.WriteString("\n\n")
+		}
+	case "none":
+		// Don't show any description
+	default:
+		// Default to short mode
+		if cmd.ShortDescription != "" {
+			md.WriteString(cmd.ShortDescription)
+			md.WriteString("\n\n")
+		} else if cmd.Description != "" {
+			md.WriteString(cmd.Description)
+			md.WriteString("\n\n")
+		}
 	}
 
 	// Code

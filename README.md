@@ -50,6 +50,7 @@ Redfish is a blazing-fast CLI tool that helps you find and recall commands using
 - 🔧 **Extensible**: Add your own cheatsheets in `~/.redfish/{lang}/`
 - 🎨 **Interactive Mode**: Optional fzf integration for visual command selection
 - ⚙️ **User-Friendly**: Configuration wizard, language preferences, help system
+- 📝 **Flexible Descriptions**: Choose between short, long, or no descriptions for each command
 
 ## 🚀 Installation
 
@@ -101,6 +102,11 @@ redfish -c
 # Search in specific language
 redfish -l en "kubernetes pods"
 redfish -l it "docker container"
+
+# Choose description display mode
+redfish -d short git pull   # Brief one-line descriptions
+redfish -d long git pull    # Detailed explanations
+redfish -d none git pull    # Hide descriptions
 
 # Show version
 redfish -v

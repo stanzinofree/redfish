@@ -16,40 +16,37 @@ import (
 )
 
 var (
-	showVersion = flag.Bool("v", false, "Show version information")
-	reloadCache = flag.Bool("r", false, "Reload cache from ~/.redfish custom cheatsheets")
-	language    = flag.String("l", "", "Language for search (supported: en, it) - overrides config")
-	showHelp    = flag.Bool("h", false, "Show help message")
-	showConfig  = flag.Bool("c", false, "Run configuration wizard")
-	useFzf      = flag.Bool("fzf", false, "Use fzf for interactive selection")
-	useShortFzf = flag.Bool("f", false, "Use fzf for interactive selection (short form)")
+	showVersion     = flag.Bool("v", false, "Show version information")
+	reloadCache     = flag.Bool("r", false, "Reload cache from ~/.redfish custom cheatsheets")
+	language        = flag.String("l", "", "Language for search (supported: en, it) - overrides config")
+	showHelp        = flag.Bool("h", false, "Show help message")
+	showConfig      = flag.Bool("c", false, "Run configuration wizard")
+	useFzf          = flag.Bool("fzf", false, "Use fzf for interactive selection")
+	useShortFzf     = flag.Bool("f", false, "Use fzf for interactive selection (short form)")
+	descriptionMode = flag.String("d", "", "Description mode: short, long, none (overrides config)")
 )
 
 func main() {
 	flag.Parse()
 
-	selectedLang := initializeAndGetLanguage()
+	cfg := loadConfigOrDefault()
+	selectedLang := determineLanguage(cfg)
+	selectedDescMode := determineDescriptionMode(cfg)
 	
 	if handleCommandFlags(selectedLang) {
 		return
 	}
 
 	query := getQueryFromArgs()
-	executeSearch(query, selectedLang)
-}
-
-// initializeAndGetLanguage initializes the app and returns the selected language
-func initializeAndGetLanguage() string {
-	if err := cache.EnsureCacheDir(); err != nil {
-		fmt.Fprintf(os.Stderr, "Warning: could not initialize cache directory: %v\n", err)
-	}
-
-	cfg := loadConfigOrDefault()
-	return determineLanguage(cfg)
+	executeSearch(query, selectedLang, selectedDescMode)
 }
 
 // loadConfigOrDefault loads config or returns default
 func loadConfigOrDefault() config.Config {
+	if err := cache.EnsureCacheDir(); err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: could not initialize cache directory: %v\n", err)
+	}
+
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: could not load config: %v\n", err)
@@ -64,6 +61,17 @@ func determineLanguage(cfg config.Config) string {
 		return *language
 	}
 	return cfg.Language
+}
+
+// determineDescriptionMode determines description mode from config and flags
+func determineDescriptionMode(cfg config.Config) string {
+	if *descriptionMode != "" {
+		return *descriptionMode
+	}
+	if cfg.DescriptionMode != "" {
+		return cfg.DescriptionMode
+	}
+	return "short" // default
 }
 
 // handleCommandFlags handles special command flags, returns true if app should exit
@@ -123,10 +131,10 @@ func getQueryFromArgs() string {
 }
 
 // executeSearch performs the search and renders results
-func executeSearch(query, selectedLang string) {
+func executeSearch(query, selectedLang, descMode string) {
 	commands := loadCommandsOrExit(selectedLang)
 	results := searchAndFilter(commands, query, selectedLang)
-	renderResults(results)
+	renderResults(results, descMode)
 }
 
 // loadCommandsOrExit loads commands or exits on error
@@ -153,11 +161,11 @@ func searchAndFilter(commands []parser.Command, query, selectedLang string) []se
 }
 
 // renderResults renders search results with optional fzf
-func renderResults(results []search.Result) {
+func renderResults(results []search.Result, descMode string) {
 	if shouldUseFzf() {
-		renderWithFzf(results)
+		renderWithFzf(results, descMode)
 	} else {
-		renderDirect(results)
+		renderDirect(results, descMode)
 	}
 }
 
@@ -167,7 +175,7 @@ func shouldUseFzf() bool {
 }
 
 // renderWithFzf renders results using fzf interactive mode
-func renderWithFzf(results []search.Result) {
+func renderWithFzf(results []search.Result, descMode string) {
 	if !fzf.IsAvailable() {
 		fmt.Fprintln(os.Stderr, "Error: fzf is not installed")
 		fmt.Fprintln(os.Stderr, "Install it with: brew install fzf (macOS) or apt install fzf (Linux)")
@@ -179,15 +187,15 @@ func renderWithFzf(results []search.Result) {
 		os.Exit(0)
 	}
 
-	if err := render.RenderResults([]search.Result{*selected}); err != nil {
+	if err := render.RenderResults([]search.Result{*selected}, descMode); err != nil {
 		fmt.Fprintf(os.Stderr, "Error rendering result: %v\n", err)
 		os.Exit(1)
 	}
 }
 
 // renderDirect renders all results directly
-func renderDirect(results []search.Result) {
-	if err := render.RenderResults(results); err != nil {
+func renderDirect(results []search.Result, descMode string) {
+	if err := render.RenderResults(results, descMode); err != nil {
 		fmt.Fprintf(os.Stderr, "Error rendering results: %v\n", err)
 		os.Exit(1)
 	}
@@ -255,6 +263,7 @@ Flags:
   -c      Run configuration wizard (set default language, etc.)
   -r      Reload cache from ~/.redfish custom cheatsheets
   -l      Language (overrides config, supported: en, it)
+  -d      Description mode: short, long, none (overrides config)
   -f/--fzf  Use fzf for interactive command selection (requires fzf installed)
 
 Custom Cheatsheets:

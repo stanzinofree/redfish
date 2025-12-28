@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-12-28
+
+### Added
+- **Description Display Modes**: Configurable description display with three modes
+  - `short`: Brief one-line descriptions (default)
+  - `long`: Detailed explanations with context and best practices
+  - `none`: Hide descriptions completely
+- **Enhanced Markdown Format**: Support for `Short_Description` and `Long_Description` fields in all cheatsheets
+- **Configuration Wizard Enhancement**: Interactive prompt for description display preference
+- **CLI Flag `-d`**: Override description mode from command line (e.g., `redfish -d long git pull`)
+- **Complete Description Coverage**: All embedded cheatsheets now include both short and long descriptions
+  - English (EN): docker, git, kubernetes, kubectl, markdown, kcsi
+  - Italian (IT): docker, git, kubernetes, kubectl, markdown, kcsi
+- **Automatic Release Workflow**: GitHub Actions workflow for automated releases on version tags
+  - Multi-platform builds (Linux, macOS, Windows × amd64/arm64/arm)
+  - SHA256 checksum generation
+  - Automatic GitHub Release creation
+
+### Changed
+- **Parser Enhancement**: Updated markdown parser to recognize `Short_Description` and `Long_Description` fields
+- **Render Logic**: Modified render engine to display descriptions based on selected mode
+- **Config Structure**: Extended configuration with `description_mode` field
+- **Backward Compatibility**: Old markdown format (plain `Description`) still fully supported
+
+### Fixed
+- **SonarCloud Security Hotspot**: Pinned GitHub Actions to commit SHA instead of mutable tags
+- **Code Complexity Issues**: Refactored `synonyms.go` and `main.go` to reduce cognitive complexity
+  - Extracted helper functions in synonyms.go: `expandToken()`, `getSynonymMap()`, `containsString()`, `filterOutString()`
+  - Split main.go into 13 focused functions with single responsibilities
+- **Code Smell**: Grouped consecutive parameters of same type in function signatures
+- **CSS Accessibility**: Extracted inline CSS to dedicated files with WCAG 2.1 AA compliant contrast ratios
+  - `docs/cheatsheet.css` with 4.5:1+ contrast ratios
+  - `docs/roadmap.css` with 7:1+ enhanced contrast
+
+### Technical Details
+- Configuration file format updated: `~/.redfish/config.yaml` now includes `description_mode` field
+- Render precedence: CLI flag `-d` > config file > default (short)
+- All 62 commands across 12 files enhanced with dual descriptions
+- Release workflow triggers on `v*` tags with version injection via ldflags
+
+## [0.1.1] - 2024-12-27
+
 ### Added
 - Initial project setup with Go
 - Modular architecture with clean separation of concerns
