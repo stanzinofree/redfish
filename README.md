@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/logo.png" alt="Redfish Logo" width="200">
+  <img src="docs/logo.png?v=2" alt="Redfish Logo" width="200">
 </p>
 
 <h1 align="center">🐟 Redfish</h1>
