@@ -1,0 +1,42 @@
+# ============================================================================
+# Redfish Version Configuration
+# ============================================================================
+# This is the single source of truth for version information.
+# Update only this file when releasing a new version.
+#
+# Used by:
+#   - Taskfile.yml (task automation)
+#   - pkg/version/version.go (runtime version info)
+# ============================================================================
+
+version: 0.1.0
+name: redfish
+fullName: Redfish Command Cheatsheet
+description: A smart command cheatsheet tool with fuzzy search and beautiful markdown rendering
+author: Alessandro Middei
+contact: alessandro.middei@gmail.com
+license: MIT
+repository: https://github.com/stanzinofree/redfish
+buildDate: ""  # Will be set during build
+
+# Project spirit and philosophy
+spirit: |
+  Redfish is born from the need to quickly recall complex commands without
+  searching through man pages or bookmarks. It provides instant access to
+  your command knowledge base with natural language fuzzy search.
+
+  Key principles:
+  - Speed: Find any command in milliseconds
+  - Beautiful: Elegant terminal output with syntax highlighting
+  - Portable: Single binary with embedded cheatsheets
+  - Extensible: Easy to add your own commands
+  - Smart: Fuzzy matching understands what you mean
+
+# Contributors (add more as needed)
+contributors:
+  - Alessandro Middei
+
+# Release information
+releases:
+  latest: 0.1.0
+  stable: 0.1.0

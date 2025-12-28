@@ -1,0 +1,299 @@
+version: '3'
+
+vars:
+  APP_NAME: redfish
+  VERSION: 0.1.0
+  BUILD_DIR: bin
+  LDFLAGS: -s -w -X main.version={{.VERSION}}
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  build:
+    desc: Build binary for current platform
+    cmds:
+      - go build -o {{.APP_NAME}} -ldflags="{{.LDFLAGS}}" ./cmd/redfish
+    sources:
+      - "**/*.go"
+      - "**/*.md"
+      - go.mod
+      - go.sum
+    generates:
+      - "{{.APP_NAME}}"
+
+  build:all:
+    desc: Build binaries for all platforms
+    cmds:
+      - task: build:darwin
+      - task: build:linux
+      - task: build:windows
+
+  build:darwin:
+    desc: Build for macOS (both Intel and ARM)
+    cmds:
+      - task: build:darwin-amd64
+      - task: build:darwin-arm64
+
+  build:darwin-amd64:
+    desc: Build for macOS Intel
+    cmds:
+      - mkdir -p {{.BUILD_DIR}}
+      - GOOS=darwin GOARCH=amd64 go build -o {{.BUILD_DIR}}/{{.APP_NAME}}-darwin-amd64 -ldflags="{{.LDFLAGS}}" ./cmd/redfish
+
+  build:darwin-arm64:
+    desc: Build for macOS Apple Silicon
+    cmds:
+      - mkdir -p {{.BUILD_DIR}}
+      - GOOS=darwin GOARCH=arm64 go build -o {{.BUILD_DIR}}/{{.APP_NAME}}-darwin-arm64 -ldflags="{{.LDFLAGS}}" ./cmd/redfish
+
+  build:linux:
+    desc: Build for Linux (amd64, arm64, arm)
+    cmds:
+      - task: build:linux-amd64
+      - task: build:linux-arm64
+      - task: build:linux-arm
+
+  build:linux-amd64:
+    desc: Build for Linux x86_64
+    cmds:
+      - mkdir -p {{.BUILD_DIR}}
+      - GOOS=linux GOARCH=amd64 go build -o {{.BUILD_DIR}}/{{.APP_NAME}}-linux-amd64 -ldflags="{{.LDFLAGS}}" ./cmd/redfish
+
+  build:linux-arm64:
+    desc: Build for Linux ARM64
+    cmds:
+      - mkdir -p {{.BUILD_DIR}}
+      - GOOS=linux GOARCH=arm64 go build -o {{.BUILD_DIR}}/{{.APP_NAME}}-linux-arm64 -ldflags="{{.LDFLAGS}}" ./cmd/redfish
+
+  build:linux-arm:
+    desc: Build for Linux ARM
+    cmds:
+      - mkdir -p {{.BUILD_DIR}}
+      - GOOS=linux GOARCH=arm go build -o {{.BUILD_DIR}}/{{.APP_NAME}}-linux-arm -ldflags="{{.LDFLAGS}}" ./cmd/redfish
+
+  build:windows:
+    desc: Build for Windows (amd64, arm64)
+    cmds:
+      - task: build:windows-amd64
+      - task: build:windows-arm64
+
+  build:windows-amd64:
+    desc: Build for Windows x86_64
+    cmds:
+      - mkdir -p {{.BUILD_DIR}}
+      - GOOS=windows GOARCH=amd64 go build -o {{.BUILD_DIR}}/{{.APP_NAME}}-windows-amd64.exe -ldflags="{{.LDFLAGS}}" ./cmd/redfish
+
+  build:windows-arm64:
+    desc: Build for Windows ARM64
+    cmds:
+      - mkdir -p {{.BUILD_DIR}}
+      - GOOS=windows GOARCH=arm64 go build -o {{.BUILD_DIR}}/{{.APP_NAME}}-windows-arm64.exe -ldflags="{{.LDFLAGS}}" ./cmd/redfish
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -rf {{.BUILD_DIR}}
+      - rm -f {{.APP_NAME}}
+      - rm -f coverage.out
+
+  install:
+    desc: Install redfish to /usr/local/bin (requires sudo)
+    deps:
+      - build
+    cmds:
+      - sudo cp {{.APP_NAME}} /usr/local/bin/{{.APP_NAME}}
+      - sudo chmod +x /usr/local/bin/{{.APP_NAME}}
+      - echo "{{.APP_NAME}} installed to /usr/local/bin"
+
+  uninstall:
+    desc: Uninstall redfish from /usr/local/bin (requires sudo)
+    cmds:
+      - sudo rm -f /usr/local/bin/{{.APP_NAME}}
+      - echo "{{.APP_NAME}} uninstalled"
+
+  run:
+    desc: "Build and run redfish with arguments (usage: task run -- git merge)"
+    deps:
+      - build
+    cmds:
+      - ./{{.APP_NAME}} {{.CLI_ARGS}}
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test -v -race -coverprofile=coverage.out ./...
+
+  test:coverage:
+    desc: Run tests and show coverage
+    cmds:
+      - task: test
+      - go tool cover -html=coverage.out
+
+  fmt:
+    desc: Format code
+    cmds:
+      - gofmt -w -s .
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - go vet ./...
+
+  lint:
+    desc: Run linter (requires golangci-lint)
+    cmds:
+      - golangci-lint run --timeout=5m
+
+  mod:
+    desc: Tidy and verify go modules
+    cmds:
+      - go mod tidy
+      - go mod verify
+
+  check:
+    desc: Run all checks (fmt, vet, lint, test)
+    cmds:
+      - task: fmt
+      - task: vet
+      - task: lint
+        ignore_error: true
+      - task: test
+      - echo "✓ All checks passed!"
+
+  dev:
+    desc: Development mode - build and install locally
+    cmds:
+      - task: build
+      - task: install
+
+  release:
+    desc: Prepare release (clean, check, build all)
+    cmds:
+      - task: clean
+      - task: check
+      - task: build:all
+      - echo "✓ Release builds ready in {{.BUILD_DIR}}/"
+
+  # PR Workflow Tasks
+  pr:
+    desc: "Create and push a new PR (usage: task pr BRANCH=feature/name TITLE='PR Title' DESC='Description')"
+    cmds:
+      - |
+        if [ -z "{{.BRANCH}}" ] || [ -z "{{.TITLE}}" ]; then
+          echo "Error: BRANCH and TITLE are required"
+          echo "Usage: task pr BRANCH=feature/name TITLE='PR Title' DESC='Description'"
+          exit 1
+        fi
+      - git checkout main
+      - git pull origin main
+      - git checkout -b {{.BRANCH}}
+      - task: check
+      - git add .
+      - git commit -m "{{.TITLE}}"
+      - git push origin {{.BRANCH}}
+      - gh pr create --title "{{.TITLE}}" --body "{{.DESC}}" --base main
+
+  pr:push:
+    desc: Push updates to current PR branch (interactive)
+    cmds:
+      - task: check
+      - git add .
+      - |
+        read -p "Commit message: " msg
+        git commit -m "$msg"
+      - git push
+
+  pr:update:
+    desc: "Update existing PR with changes (usage: task pr:update MESSAGE='commit message')"
+    cmds:
+      - task: check
+      - git add .
+      - git commit -m "{{.MESSAGE}}"
+      - git push
+
+  # Release Management Tasks
+  tag:
+    desc: "Create and push a git tag (usage: task tag VERSION=0.1.0 MESSAGE='Release notes')"
+    cmds:
+      - |
+        if [ -z "{{.VERSION}}" ]; then
+          echo "Error: VERSION is required"
+          echo "Usage: task tag VERSION=0.1.0 MESSAGE='Release notes'"
+          exit 1
+        fi
+      - git checkout main
+      - git pull origin main
+      - git tag -a v{{.VERSION}} -m "{{.MESSAGE}}"
+      - git push origin v{{.VERSION}}
+      - echo "✓ Tag v{{.VERSION}} created and pushed"
+
+  release:github:
+    desc: "Create GitHub release with binaries (usage: task release:github VERSION=0.1.0)"
+    deps:
+      - build:all
+    cmds:
+      - |
+        if [ -z "{{.VERSION}}" ]; then
+          echo "Error: VERSION is required"
+          echo "Usage: task release:github VERSION=0.1.0"
+          exit 1
+        fi
+      - |
+        gh release create v{{.VERSION}} \
+          --title "v{{.VERSION}}" \
+          --notes-file CHANGELOG.md \
+          {{.BUILD_DIR}}/{{.APP_NAME}}-darwin-amd64 \
+          {{.BUILD_DIR}}/{{.APP_NAME}}-darwin-arm64 \
+          {{.BUILD_DIR}}/{{.APP_NAME}}-linux-amd64 \
+          {{.BUILD_DIR}}/{{.APP_NAME}}-linux-arm64 \
+          {{.BUILD_DIR}}/{{.APP_NAME}}-linux-arm \
+          {{.BUILD_DIR}}/{{.APP_NAME}}-windows-amd64.exe \
+          {{.BUILD_DIR}}/{{.APP_NAME}}-windows-arm64.exe
+      - echo "✓ Release v{{.VERSION}} created on GitHub"
+
+  # Git Workflow Shortcuts
+  sync:
+    desc: Sync main branch with remote
+    cmds:
+      - git checkout main
+      - git pull origin main
+      - echo "✓ Main branch synced"
+
+  branch:
+    desc: "Create new branch from main (usage: task branch NAME=feature/my-feature)"
+    cmds:
+      - |
+        if [ -z "{{.NAME}}" ]; then
+          echo "Error: NAME is required"
+          echo "Usage: task branch NAME=feature/my-feature"
+          exit 1
+        fi
+      - git checkout main
+      - git pull origin main
+      - git checkout -b {{.NAME}}
+      - echo "✓ Branch {{.NAME}} created"
+
+  # Quick test command examples
+  demo:git:
+    desc: Demo - search for git commands
+    deps:
+      - build
+    cmds:
+      - ./{{.APP_NAME}} git
+
+  demo:docker:
+    desc: Demo - search for docker commands
+    deps:
+      - build
+    cmds:
+      - ./{{.APP_NAME}} docker
+
+  demo:merge:
+    desc: Demo - search for merge and delete branch
+    deps:
+      - build
+    cmds:
+      - ./{{.APP_NAME}} git merge and delete branch

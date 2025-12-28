@@ -1,0 +1,190 @@
+/* kcsi Roadmap - Specific Styles */
+
+.container {
+    max-width: 1200px;
+}
+
+.progress-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 40px;
+    background: #f8f9fa;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 3em;
+    font-weight: bold;
+    background: linear-gradient(135deg, #4a5a9a 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    color: #495057;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.phase {
+    margin-bottom: 50px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 30px;
+    position: relative;
+}
+
+.phase.completed {
+    background: #d4edda;
+    border-left: 5px solid #28a745;
+}
+
+.phase.in-progress {
+    background: #fff3cd;
+    border-left: 5px solid #ffc107;
+}
+
+.phase.pending {
+    background: #f8f9fa;
+    border-left: 5px solid #6c757d;
+}
+
+.phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.phase-title {
+    font-size: 1.8em;
+    color: #212529;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.phase-badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.7em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.badge-completed {
+    background: #1e7e34;
+    color: white;
+}
+
+.badge-progress {
+    background: #ffc107;
+    color: #212529;
+}
+
+.badge-pending {
+    background: #6c757d;
+    color: white;
+}
+
+.progress-bar-container {
+    background: #e9ecef;
+    border-radius: 10px;
+    height: 10px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #4a5a9a;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.task-list {
+    list-style: none;
+    margin-top: 20px;
+}
+
+.task-item {
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.task-item:last-child {
+    border-bottom: none;
+}
+
+.task-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.task-checkbox.done {
+    background: #1e7e34;
+    color: white;
+}
+
+.task-checkbox.todo {
+    background: #e9ecef;
+    border: 2px solid #6c757d;
+}
+
+.task-text {
+    flex: 1;
+    color: #212529;
+    font-weight: 500;
+}
+
+.task-text.done {
+    text-decoration: line-through;
+    color: #495057;
+    opacity: 1;
+}
+
+/* Override code styling for roadmap - use lighter style on light backgrounds */
+code {
+    background: #e9ecef;
+    color: #495057;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+/* Planned features section titles - improve contrast */
+.phase.pending h3 {
+    color: #212529 !important;
+    font-weight: 600;
+}
+
+/* Footer styles moved to common.css */
+
+@media (max-width: 768px) {
+    .progress-summary {
+        grid-template-columns: 1fr;
+    }
+}
