@@ -15,7 +15,7 @@ const (
 	fallbackLanguage = "en"
 )
 
-var supportedLanguages = []string{"en", "it"}
+var supportedLanguages = []string{"en", "it", "es", "fr", "de"}
 
 // GetCacheDir returns the cache directory path
 func GetCacheDir() (string, error) {
