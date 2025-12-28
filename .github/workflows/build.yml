@@ -77,7 +77,7 @@ jobs:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
       run: |
-        go build -v -ldflags="-s -w" -o redfish-${{ matrix.goos }}-${{ matrix.goarch }} ./cmd/redfish
+        go build -v -ldflags="-s -w" -o redfish-${{ matrix.goos }}-${{ matrix.goarch }} .
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
