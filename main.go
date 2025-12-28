@@ -10,14 +10,16 @@ import (
 	"github.com/stanzinofree/redfish/internal/render"
 	"github.com/stanzinofree/redfish/internal/search"
 	"github.com/stanzinofree/redfish/pkg/cache"
+	"github.com/stanzinofree/redfish/pkg/config"
 	"github.com/stanzinofree/redfish/pkg/version"
 )
 
 var (
-	showVersion = flag.Bool("v", false, "Show version information")
-	reloadCache = flag.Bool("r", false, "Reload cache from ~/.redfish custom cheatsheets")
-	language    = flag.String("l", "en", "Language for search (supported: en, it)")
-	showHelp    = flag.Bool("h", false, "Show help message")
+	showVersion  = flag.Bool("v", false, "Show version information")
+	reloadCache  = flag.Bool("r", false, "Reload cache from ~/.redfish custom cheatsheets")
+	language     = flag.String("l", "", "Language for search (supported: en, it) - overrides config")
+	showHelp     = flag.Bool("h", false, "Show help message")
+	showConfig   = flag.Bool("c", false, "Run configuration wizard")
 )
 
 func main() {
@@ -27,6 +29,19 @@ func main() {
 	// Initialize cache directory on first run
 	if err := cache.EnsureCacheDir(); err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: could not initialize cache directory: %v\n", err)
+	}
+
+	// Load configuration
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: could not load config: %v\n", err)
+		cfg = config.GetDefaultConfig()
+	}
+
+	// Determine language to use (flag overrides config)
+	selectedLang := cfg.Language
+	if *language != "" {
+		selectedLang = *language
 	}
 
 	// Handle flags
@@ -40,8 +55,16 @@ func main() {
 		os.Exit(0)
 	}
 
+	if *showConfig {
+		if err := config.RunWizard(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error running configuration wizard: %v\n", err)
+			os.Exit(1)
+		}
+		os.Exit(0)
+	}
+
 	if *reloadCache {
-		if err := rebuildCache(*language); err != nil {
+		if err := rebuildCache(selectedLang); err != nil {
 			fmt.Fprintf(os.Stderr, "Error rebuilding cache: %v\n", err)
 			os.Exit(1)
 		}
@@ -59,7 +82,7 @@ func main() {
 	query := strings.Join(args, " ")
 
 	// Load commands (embedded + cached custom)
-	commands, err := loadAllCommands(*language)
+	commands, err := loadAllCommands(selectedLang)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error loading commands: %v\n", err)
 		os.Exit(1)
@@ -140,8 +163,9 @@ Examples:
 Flags:
   -h    Show this help message
   -v    Show version information
+  -c    Run configuration wizard (set default language, etc.)
   -r    Reload cache from ~/.redfish custom cheatsheets
-  -l    Language (default: en, supported: en, it)
+  -l    Language (overrides config, supported: en, it)
 
 Custom Cheatsheets:
   Add your own .md files to ~/.redfish/<lang>/ and run 'redfish -r -l <lang>' to include them
