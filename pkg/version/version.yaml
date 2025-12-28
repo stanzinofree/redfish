@@ -9,7 +9,7 @@
 #   - pkg/version/version.go (runtime version info)
 # ============================================================================
 
-version: 0.1.0
+version: 0.1.1
 name: redfish
 fullName: Redfish Command Cheatsheet
 description: A smart command cheatsheet tool with fuzzy search and beautiful markdown rendering

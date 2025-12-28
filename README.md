@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/stanzinofree/redfish/releases"><img src="https://img.shields.io/badge/version-0.1.0-blue.svg" alt="Version"></a>
+  <a href="https://github.com/stanzinofree/redfish/releases"><img src="https://img.shields.io/badge/version-0.1.1-blue.svg" alt="Version"></a>
   <a href="https://golang.org/"><img src="https://img.shields.io/badge/go-1.23+-00ADD8.svg" alt="Go Version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
   <a href="#installation"><img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg" alt="Platform"></a>
@@ -40,12 +40,16 @@ Redfish is a blazing-fast CLI tool that helps you find and recall commands using
 
 ## ✨ Features
 
-- 🔍 **Fuzzy Search**: Find commands using natural language queries
-- 📦 **Embedded Data**: All cheatsheets embedded in the binary - no external files needed
-- 🎨 **Beautiful Output**: Markdown rendering with syntax highlighting via Glamour/Glow
-- ⚡ **Fast**: Written in Go, instant results
-- 🔧 **Extensible**: Easy to add new commands by editing markdown files
-- 🌈 **Smart Scoring**: Weighted matching on titles, tags, keywords, and descriptions
+- 🔍 **Intelligent Search**: NLP-like queries with stopwords filtering and synonym expansion
+- 🌍 **Multi-Language**: Full support for English and Italian (with ES, FR, DE planned)
+- 📦 **Rich Embedded Cheatsheets**: Git, Docker, Kubernetes, Kubectl, Markdown, and more
+- 🎨 **Beautiful Output**: Markdown rendering with syntax highlighting via Glamour
+- ⚡ **Lightning Fast**: Written in Go, instant results even with large cheatsheet libraries
+- 🛡️ **Secure Architecture**: Protected embedded cheatsheets + user custom commands
+- 🎯 **Smart Scoring**: Weighted fuzzy matching with coverage-based filtering
+- 🔧 **Extensible**: Add your own cheatsheets in `~/.redfish/{lang}/`
+- 🎨 **Interactive Mode**: Optional fzf integration for visual command selection
+- ⚙️ **User-Friendly**: Configuration wizard, language preferences, help system
 
 ## 🚀 Installation
 
@@ -64,22 +68,66 @@ go build -o redfish cmd/redfish/main.go
 sudo mv redfish /usr/local/bin/
 ```
 
-## 📖 Usage
+## 📖 Quick Start
 
-Search for commands using natural language:
+### Basic Search
 
 ```bash
-# Search for git commands
-redfish git
+# Simple search
+redfish git commit
 
-# Search for specific workflows
-redfish git merge and delete branch
-
-# Search for docker compose
+# Multi-word search
 redfish docker compose up
 
-# Multi-word queries
-redfish kubernetes deployment rolling update
+# Natural language queries (NLP-like)
+redfish "how do i list docker containers"
+redfish "voglio fare un merge git"  # Italian
+```
+
+### Interactive Mode
+
+```bash
+# Use fzf for interactive selection
+redfish -f kubernetes
+redfish --fzf docker
+```
+
+### Configuration
+
+```bash
+# Run configuration wizard
+redfish -c
+
+# Search in specific language
+redfish -l en "kubernetes pods"
+redfish -l it "docker container"
+
+# Show version
+redfish -v
+
+# Show help
+redfish -h
+```
+
+### Custom Cheatsheets
+
+```bash
+# Add your own commands
+mkdir -p ~/.redfish/en
+cat > ~/.redfish/en/myapp.md << 'EOF'
+## myapp start
+**Tags**: myapp, start, run
+**Keywords**: start run launch
+
+Start my application
+
+```sh
+myapp start --port 8080
+```
+EOF
+
+# Search your custom commands
+redfish myapp
 ```
 
 ### Example Output
@@ -109,31 +157,70 @@ Push local commits to remote repository
 redfish/
 ├── cmd/
 │   └── redfish/
-│       └── main.go              # CLI entry point
+│       └── main.go              # CLI entry point (deprecated, use root main.go)
+├── main.go                      # Main CLI entry point
 ├── internal/
 │   ├── parser/
-│   │   ├── parser.go            # Markdown parser
+│   │   ├── parser.go            # Markdown parser with multi-language support
 │   │   └── data/                # Embedded markdown cheatsheets
-│   │       ├── git.md
-│   │       └── docker.md
+│   │       ├── en/              # English cheatsheets
+│   │       │   ├── git.md
+│   │       │   ├── docker.md
+│   │       │   ├── kubernetes.md
+│   │       │   ├── kubectl.md
+│   │       │   ├── markdown.md
+│   │       │   └── kcsi.md
+│   │       └── it/              # Italian cheatsheets
+│   │           ├── git.md
+│   │           ├── docker.md
+│   │           ├── kubernetes.md
+│   │           ├── kubectl.md
+│   │           ├── markdown.md
+│   │           └── kcsi.md
 │   ├── search/
-│   │   └── search.go            # Fuzzy search engine
+│   │   ├── search.go            # Intelligent fuzzy search engine
+│   │   ├── stopwords.go         # Stopwords filtering (EN/IT)
+│   │   └── synonyms.go          # Synonym expansion & verb forms
 │   └── render/
-│       └── render.go            # Glamour-based renderer
+│       └── render.go            # Glamour-based markdown renderer
+├── pkg/
+│   ├── cache/
+│   │   └── cache.go             # User cheatsheet cache & merge logic
+│   ├── config/
+│   │   ├── config.go            # YAML configuration management
+│   │   └── wizard.go            # Interactive configuration wizard
+│   ├── fzf/
+│   │   └── fzf.go               # fzf integration for interactive mode
+│   └── version/
+│       ├── version.go           # Version information
+│       └── version.yaml         # Version manifest
 ├── docs/
-│   ├── cheatsheet.html          # Static documentation
-│   └── roadmap.html             # Development roadmap
+│   ├── cheatsheet.html          # Interactive documentation
+│   ├── roadmap.html             # Development roadmap
+│   └── logo.png                 # Project logo
 ├── .github/
 │   └── workflows/
-│       └── ci.yml               # GitHub Actions CI/CD
+│       ├── build.yml            # Build & release workflow
+│       └── pages.yml            # GitHub Pages deployment
 ├── go.mod
 ├── README.md
-└── CHANGELOG.md
+├── CHANGELOG.md
+└── Taskfile.yml                 # Task automation
 ```
 
-## 📝 Adding New Commands
+## 📝 Adding Custom Commands
 
-1. Create or edit a markdown file in `internal/parser/data/`
+### User Custom Cheatsheets
+
+Create your own cheatsheets in `~/.redfish/{lang}/`:
+
+1. Create a markdown file:
+
+```bash
+mkdir -p ~/.redfish/en
+nano ~/.redfish/en/mycommands.md
+```
+
 2. Follow this format:
 
 ```markdown
@@ -149,23 +236,61 @@ another example
 \`\`\`
 ```
 
-3. Rebuild the binary:
+3. Your commands are immediately available:
 
 ```bash
-go build -o redfish cmd/redfish/main.go
+redfish mycommand
+```
+
+### Contributing Embedded Cheatsheets
+
+To add commands to the embedded library:
+
+1. Edit files in `internal/parser/data/{lang}/`
+2. Follow the same markdown format
+3. Add both English (`en/`) and Italian (`it/`) versions
+4. Submit a Pull Request
+
+```bash
+# Example: Add new tool
+echo "## mytool command..." >> internal/parser/data/en/mytool.md
+echo "## mytool comando..." >> internal/parser/data/it/mytool.md
+go build -v .
 ```
 
 ## 🔍 How Search Works
 
-Redfish uses a weighted fuzzy matching algorithm:
+### Intelligent Search Pipeline
 
-- **Title matches** (highest priority): 10 points for fuzzy, 8 for exact substring
-- **Tag matches**: 5 points for fuzzy, 4 for exact substring  
-- **Keyword matches**: 3 points for fuzzy, 2.5 for exact substring
-- **Description matches**: 1 point
-- **Code matches**: 0.5 points
+1. **Tokenization**: Query split into individual terms
+2. **Stopwords Filtering**: Common words removed (how, do, i, want, voglio, fare, etc.)
+3. **Synonym Expansion**: Terms expanded with related words
+   - Verb forms: `listare` → `list`, `show`, `display`, `ls`, `ps`
+   - Concepts: `docker` → `container`, `containers`
+   - Language-aware (EN/IT)
+4. **Weighted Fuzzy Matching**:
+   - **Title matches** (highest): 10pt fuzzy, 8pt exact
+   - **Tag matches**: 5pt fuzzy, 4pt exact
+   - **Keyword matches**: 3pt fuzzy, 2.5pt exact
+   - **Description matches**: 1pt
+   - **Code matches**: 0.5pt
+5. **Coverage Filtering**: Multi-token searches require 70% match threshold
+6. **Score Calculation**: Base score × (1 + coverage percentage)
+7. **Smart Limiting**: Top 5 results for specific queries, top 10 for general
 
-Scores are multiplied by coverage bonus (percentage of query terms matched).
+### Example Query Flow
+
+```
+Input:  "voglio listare i docker"
+↓
+Tokens: ["voglio", "listare", "i", "docker"]
+↓
+Filtered: ["listare", "docker"]  (stopwords removed)
+↓
+Expanded: ["listare", "lista", "list", "show", "ls", "ps", "docker", "container", "containers"]
+↓
+Matched: "docker ps" (score: 148.06, coverage: 100%)
+```
 
 ## 🛠️ Development
 
@@ -220,15 +345,21 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📋 Roadmap
 
-See [docs/roadmap.html](docs/roadmap.html) for the full development roadmap.
+See [docs/roadmap.html](https://stanzinofree.github.io/redfish/roadmap.html) for the full development roadmap.
 
-**Current Phase**: Core Implementation
-- [x] Migrate from Zig to Go
-- [x] Modular architecture
-- [x] Fuzzy search engine
-- [x] Glamour rendering
-- [ ] CI/CD setup
-- [ ] Quality gates (SonarCloud, tests)
+**Completed Phases**:
+- ✅ **Phase 1**: Core Implementation (Go migration, modular architecture, fuzzy search, Glamour rendering)
+- ✅ **Phase 2**: Intelligent Search (NLP queries, stopwords, synonyms, multi-language)
+- ✅ **Phase 3**: User Experience (config wizard, custom cheatsheets, secure architecture)
+
+**Current Phase**: Distribution & Quality
+- [x] SonarCloud integration
+- [x] GitHub Actions CI/CD
+- [x] Multi-platform builds
+- [x] GitHub Pages documentation
+- [ ] Comprehensive unit tests
+- [ ] Release automation
+- [ ] Homebrew/package managers
 
 ## 📄 License
 

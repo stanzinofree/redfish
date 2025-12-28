@@ -124,52 +124,71 @@
         </nav>
 
         <div class="phase">
-            <h2>Phase 1: Core Implementation <span class="phase-status in-progress">In Progress</span></h2>
+            <h2>Phase 1: Core Implementation <span class="phase-status completed">✓ Completed</span></h2>
             <ul>
                 <li class="done">Migrate from Zig to Go</li>
                 <li class="done">Create modular project structure</li>
                 <li class="done">Implement markdown parser with embed support</li>
-                <li class="done">Build fuzzy search engine</li>
+                <li class="done">Build fuzzy search engine with weighted scoring</li>
                 <li class="done">Integrate Glamour/Glow for beautiful rendering</li>
-                <li class="in-progress">Add initial command examples (git, docker)</li>
-                <li>Setup GitHub repository and CI/CD</li>
-                <li>Configure quality gates (gofmt, go vet, tests)</li>
+                <li class="done">Add comprehensive embedded cheatsheets (git, docker, kubernetes, kubectl, markdown, kcsi)</li>
+                <li class="done">Setup GitHub repository and CI/CD</li>
+                <li class="done">Configure quality gates (SonarCloud, gofmt, go vet)</li>
             </ul>
         </div>
 
         <div class="phase">
-            <h2>Phase 2: Quality & Distribution <span class="phase-status planned">Planned</span></h2>
+            <h2>Phase 2: Intelligent Search <span class="phase-status completed">✓ Completed</span></h2>
             <ul>
-                <li>Integrate SonarCloud for code quality</li>
-                <li>Add comprehensive unit tests</li>
-                <li>Setup GitHub Actions workflows</li>
-                <li>Create release automation (goreleaser)</li>
+                <li class="done">Multi-language support (English, Italian)</li>
+                <li class="done">Natural Language Processing (NLP-like queries)</li>
+                <li class="done">Stopwords filtering (EN/IT)</li>
+                <li class="done">Synonym expansion and verb forms</li>
+                <li class="done">Smart AND logic for multi-token searches</li>
+                <li class="done">Coverage-based result filtering (70% threshold)</li>
+                <li class="done">Interactive fzf integration</li>
+                <li class="done">Smart output limiting (specific vs. general queries)</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h2>Phase 3: User Experience <span class="phase-status completed">✓ Completed</span></h2>
+            <ul>
+                <li class="done">Configuration wizard (-c flag)</li>
+                <li class="done">YAML-based user preferences (~/.redfish/config.yaml)</li>
+                <li class="done">Language selection and override</li>
+                <li class="done">Custom user cheatsheets support (~/.redfish/{lang}/)</li>
+                <li class="done">Secure architecture (embedded protected, custom editable)</li>
+                <li class="done">Auto-merge embedded + custom commands</li>
+                <li class="done">Cache system with language separation</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h2>Phase 4: Distribution & Quality <span class="phase-status in-progress">In Progress</span></h2>
+            <ul>
+                <li class="done">SonarCloud integration and quality gate passing</li>
+                <li class="done">GitHub Actions CI/CD workflows</li>
+                <li class="done">Multi-platform builds (darwin/linux, amd64/arm64)</li>
+                <li class="done">GitHub Pages documentation site</li>
+                <li class="in-progress">Comprehensive unit tests coverage</li>
+                <li>Release automation (goreleaser)</li>
                 <li>Publish to Homebrew</li>
-                <li>Add pre-commit hooks</li>
+                <li>Package for apt/yum repositories</li>
             </ul>
         </div>
 
         <div class="phase">
-            <h2>Phase 3: Feature Expansion <span class="phase-status planned">Planned</span></h2>
+            <h2>Phase 5: Future Enhancements <span class="phase-status planned">Planned</span></h2>
             <ul>
-                <li>Add interactive mode with TUI (bubbletea)</li>
-                <li>Support custom user cheatsheets (~/.redfish/)</li>
-                <li>Add command categories and filtering</li>
-                <li>Implement command aliases</li>
-                <li>Add export to various formats (HTML, PDF)</li>
-                <li>Create web interface for browsing commands</li>
-            </ul>
-        </div>
-
-        <div class="phase">
-            <h2>Phase 4: Advanced Features <span class="phase-status planned">Planned</span></h2>
-            <ul>
-                <li>Add machine learning for better search relevance</li>
-                <li>Support multi-language commands</li>
-                <li>Implement command history and favorites</li>
-                <li>Add plugin system for custom renderers</li>
-                <li>Create community command repository</li>
-                <li>Add command execution with confirmation</li>
+                <li>Add more language support (Spanish, French, German)</li>
+                <li>Expand embedded cheatsheets (aws, gcloud, terraform, ansible)</li>
+                <li>Command history and favorites tracking</li>
+                <li>Export to various formats (HTML, PDF, man pages)</li>
+                <li>Community cheatsheet repository</li>
+                <li>Plugin system for custom search algorithms</li>
+                <li>Web-based cheatsheet browser</li>
+                <li>Command execution with dry-run mode</li>
             </ul>
         </div>
 

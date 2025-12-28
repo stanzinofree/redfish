@@ -51,11 +51,11 @@ func ExpandWithSynonyms(tokens []string, lang string) []string {
 	}
 
 	expanded := make([]string, 0, len(tokens)*2)
-	
+
 	for _, token := range tokens {
 		// Add original token
 		expanded = append(expanded, token)
-		
+
 		// Check if token matches any base word or its synonyms
 		for baseWord, variants := range synonyms {
 			// Check if token is the base word
@@ -63,7 +63,7 @@ func ExpandWithSynonyms(tokens []string, lang string) []string {
 				expanded = append(expanded, variants...)
 				break
 			}
-			
+
 			// Check if token is one of the variants
 			for _, variant := range variants {
 				if token == variant {
@@ -88,28 +88,28 @@ func ExpandWithSynonyms(tokens []string, lang string) []string {
 func uniqueTokens(tokens []string) []string {
 	seen := make(map[string]bool)
 	result := make([]string, 0, len(tokens))
-	
+
 	for _, token := range tokens {
 		if !seen[token] {
 			seen[token] = true
 			result = append(result, token)
 		}
 	}
-	
+
 	return result
 }
 
 // NormalizeVerb tries to normalize Italian/English verb forms to base form
 func NormalizeVerb(word string, lang string) string {
 	word = strings.ToLower(word)
-	
+
 	if lang == "it" {
 		// Italian verb endings to base forms
 		// Remove common verb endings
 		if strings.HasSuffix(word, "are") || strings.HasSuffix(word, "ire") || strings.HasSuffix(word, "ere") {
 			return word // Already in infinitive
 		}
-		
+
 		// Simple normalization for common patterns
 		replacements := map[string]string{
 			"lista":    "listare",
@@ -128,7 +128,7 @@ func NormalizeVerb(word string, lang string) string {
 			"compila":  "compilare",
 			"installa": "installare",
 		}
-		
+
 		if normalized, ok := replacements[word]; ok {
 			return normalized
 		}
@@ -150,11 +150,11 @@ func NormalizeVerb(word string, lang string) string {
 			"merging":  "merge",
 			"building": "build",
 		}
-		
+
 		if normalized, ok := replacements[word]; ok {
 			return normalized
 		}
 	}
-	
+
 	return word
 }

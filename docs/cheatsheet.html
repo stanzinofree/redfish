@@ -124,8 +124,96 @@
         </div>
 
         <div class="section">
-            <h2>Usage Examples</h2>
-            <p>Add your cheatsheet content here. This will be populated as you add commands to the <code>data/</code> directory.</p>
+            <h2>Basic Usage</h2>
+            <div class="commands">
+                <div class="command-card">
+                    <h3>Simple Search</h3>
+                    <code>redfish git commit</code>
+                    <p>Search for git commit commands</p>
+                </div>
+                <div class="command-card">
+                    <h3>Natural Language</h3>
+                    <code>redfish "how do i list docker containers"</code>
+                    <p>Use natural language queries (NLP-like)</p>
+                </div>
+                <div class="command-card">
+                    <h3>Italian Search</h3>
+                    <code>redfish -l it "voglio listare i docker"</code>
+                    <p>Search in Italian with synonym expansion</p>
+                </div>
+                <div class="command-card">
+                    <h3>Interactive Mode (fzf)</h3>
+                    <code>redfish -f kubernetes</code>
+                    <p>Use fzf for interactive command selection</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Configuration</h2>
+            <div class="commands">
+                <div class="command-card">
+                    <h3>Run Config Wizard</h3>
+                    <code>redfish -c</code>
+                    <p>Interactive wizard to set default language</p>
+                </div>
+                <div class="command-card">
+                    <h3>Show Version</h3>
+                    <code>redfish -v</code>
+                    <p>Display version information</p>
+                </div>
+                <div class="command-card">
+                    <h3>Show Help</h3>
+                    <code>redfish -h</code>
+                    <p>Display help and usage information</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Embedded Cheatsheets</h2>
+            <div class="tags">
+                <span class="tag">Git</span>
+                <span class="tag">Docker</span>
+                <span class="tag">Kubernetes</span>
+                <span class="tag">Kubectl</span>
+                <span class="tag">Markdown</span>
+                <span class="tag">KCSI</span>
+            </div>
+            <p style="margin-top: 1rem;">All cheatsheets available in English and Italian</p>
+        </div>
+
+        <div class="section">
+            <h2>Custom Cheatsheets</h2>
+            <div class="command-card">
+                <h3>Add Your Own</h3>
+                <p>Create <code>~/.redfish/{lang}/*.md</code> files with your custom commands</p>
+                <code>mkdir -p ~/.redfish/en<br>echo "# My Commands..." > ~/.redfish/en/myapp.md</code>
+                <p style="margin-top: 1rem;">Format:</p>
+                <code>## command name<br>**Tags**: tag1, tag2<br>**Keywords**: keyword1 keyword2<br><br>Description<br><br>```sh<br>command example<br>```</code>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Advanced Features</h2>
+            <div class="commands">
+                <div class="command-card">
+                    <h3>Stopwords Filtering</h3>
+                    <p>Automatically removes common words like "how", "do", "i", "want" from queries</p>
+                </div>
+                <div class="command-card">
+                    <h3>Synonym Expansion</h3>
+                    <p>Expands search terms with synonyms and verb forms (listare↔list, docker↔container)</p>
+                </div>
+                <div class="command-card">
+                    <h3>Smart AND Logic</h3>
+                    <p>Multi-word searches require 70% token coverage for precise results</p>
+                </div>
+                <div class="command-card">
+                    <h3>Weighted Scoring</h3>
+                    <p>Title matches (10pt) > Tags (5pt) > Keywords (3pt) > Description (1pt)</p>
+                </div>
+            </div>
         </div>
 
         <footer>
