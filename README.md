@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/stanzinofree/redfish/releases"><img src="https://img.shields.io/badge/version-0.1.0-blue.svg" alt="Version"></a>
-  <a href="https://golang.org/"><img src="https://img.shields.io/badge/go-1.21+-00ADD8.svg" alt="Go Version"></a>
+  <a href="https://golang.org/"><img src="https://img.shields.io/badge/go-1.23+-00ADD8.svg" alt="Go Version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"></a>
   <a href="#installation"><img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg" alt="Platform"></a>
   <a href="https://stanzinofree.github.io/redfish/"><img src="https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg" alt="Documentation"></a>
@@ -171,7 +171,7 @@ Scores are multiplied by coverage bonus (percentage of query terms matched).
 
 ### Prerequisites
 
-- Go 1.21 or higher
+- Go 1.23 or higher
 - Git
 
 ### Setup
