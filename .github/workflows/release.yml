@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: 'stable'
+
+    - name: Get version
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+    - name: Build binaries
+      run: |
+        # Linux amd64
+        GOOS=linux GOARCH=amd64 go build -v -ldflags="-s -w -X github.com/stanzinofree/redfish/pkg/version.Version=${{ steps.get_version.outputs.VERSION }}" -o redfish-linux-amd64 .
+        
+        # Linux arm64
+        GOOS=linux GOARCH=arm64 go build -v -ldflags="-s -w -X github.com/stanzinofree/redfish/pkg/version.Version=${{ steps.get_version.outputs.VERSION }}" -o redfish-linux-arm64 .
+        
+        # Linux arm
+        GOOS=linux GOARCH=arm go build -v -ldflags="-s -w -X github.com/stanzinofree/redfish/pkg/version.Version=${{ steps.get_version.outputs.VERSION }}" -o redfish-linux-arm .
+        
+        # macOS amd64
+        GOOS=darwin GOARCH=amd64 go build -v -ldflags="-s -w -X github.com/stanzinofree/redfish/pkg/version.Version=${{ steps.get_version.outputs.VERSION }}" -o redfish-darwin-amd64 .
+        
+        # macOS arm64
+        GOOS=darwin GOARCH=arm64 go build -v -ldflags="-s -w -X github.com/stanzinofree/redfish/pkg/version.Version=${{ steps.get_version.outputs.VERSION }}" -o redfish-darwin-arm64 .
+        
+        # Windows amd64
+        GOOS=windows GOARCH=amd64 go build -v -ldflags="-s -w -X github.com/stanzinofree/redfish/pkg/version.Version=${{ steps.get_version.outputs.VERSION }}" -o redfish-windows-amd64.exe .
+        
+        # Windows arm64
+        GOOS=windows GOARCH=arm64 go build -v -ldflags="-s -w -X github.com/stanzinofree/redfish/pkg/version.Version=${{ steps.get_version.outputs.VERSION }}" -o redfish-windows-arm64.exe .
+
+    - name: Generate checksums
+      run: |
+        sha256sum redfish-* > checksums.txt
+        cat checksums.txt
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Release ${{ steps.get_version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        files: |
+          redfish-linux-amd64
+          redfish-linux-arm64
+          redfish-linux-arm
+          redfish-darwin-amd64
+          redfish-darwin-arm64
+          redfish-windows-amd64.exe
+          redfish-windows-arm64.exe
+          checksums.txt
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
