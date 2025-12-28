@@ -27,23 +27,27 @@ func SearchWithLanguage(commands []parser.Command, query string, lang string) []
 
 	// Remove stopwords for more intelligent searching
 	filteredTokens := RemoveStopwords(tokens, lang)
-	
+
+	// Expand tokens with synonyms and verb forms
+	expandedTokens := ExpandWithSynonyms(filteredTokens, lang)
+
 	// Detect if this is a multi-token search (requires AND logic)
 	requireAll := len(filteredTokens) > 1
 
 	var results []Result
 	for _, cmd := range commands {
-		score := scoreCommand(cmd, filteredTokens)
-		
+		score := scoreCommand(cmd, expandedTokens)
+
 		// For multi-token searches, require minimum coverage (AND logic)
+		// Coverage is checked against filteredTokens (user's intent) not expandedTokens
 		if requireAll {
-			coverage := calculateCoverage(cmd, filteredTokens)
-			// Require at least 70% of tokens to match
+			coverage := calculateCoverageForOriginalTokens(cmd, filteredTokens, expandedTokens)
+			// Require at least 70% of original tokens to match
 			if coverage < 0.7 {
 				continue
 			}
 		}
-		
+
 		if score > 0 {
 			results = append(results, Result{
 				Command: cmd,
@@ -146,6 +150,62 @@ func scoreCodeMatch(code, token string) float64 {
 func calculateCoverage(cmd parser.Command, tokens []string) float64 {
 	matched := countMatches(cmd, tokens)
 	return float64(matched) / float64(len(tokens))
+}
+
+// calculateCoverageForOriginalTokens checks if each original token (or its synonyms) matches
+func calculateCoverageForOriginalTokens(cmd parser.Command, originalTokens []string, expandedTokens []string) float64 {
+	if len(originalTokens) == 0 {
+		return 1.0
+	}
+
+	matched := 0
+	for _, origToken := range originalTokens {
+		// Check if the original token or any of its expanded forms matches
+		if tokenMatchesCommand(cmd, origToken, expandedTokens) {
+			matched++
+		}
+	}
+
+	return float64(matched) / float64(len(originalTokens))
+}
+
+// tokenMatchesCommand checks if a token (or any of its synonyms in expandedTokens) matches the command
+func tokenMatchesCommand(cmd parser.Command, token string, expandedTokens []string) bool {
+	// First check if the original token matches
+	if strings.Contains(strings.ToLower(cmd.Title), token) {
+		return true
+	}
+
+	for _, tag := range cmd.Tags {
+		if strings.Contains(strings.ToLower(tag), token) {
+			return true
+		}
+	}
+
+	if strings.Contains(strings.ToLower(cmd.Keywords), token) {
+		return true
+	}
+
+	// If original token doesn't match, check if any of its synonyms in expandedTokens match
+	for _, expandedToken := range expandedTokens {
+		// Only check tokens that are related to the original token
+		// (We need to check all expanded tokens since they might be synonyms of the original)
+		if strings.Contains(strings.ToLower(cmd.Title), expandedToken) {
+			return true
+		}
+
+		for _, tag := range cmd.Tags {
+			if strings.Contains(strings.ToLower(tag), expandedToken) {
+				return true
+			}
+		}
+
+		if strings.Contains(strings.ToLower(cmd.Keywords), expandedToken) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // countMatches counts how many tokens match in the command
