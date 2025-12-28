@@ -249,15 +249,45 @@ redfish mycommand
 To add commands to the embedded library:
 
 1. Edit files in `internal/parser/data/{lang}/`
-2. Follow the same markdown format
+2. Follow the enhanced markdown format (see below)
 3. Add both English (`en/`) and Italian (`it/`) versions
 4. Submit a Pull Request
 
-```bash
-# Example: Add new tool
-echo "## mytool command..." >> internal/parser/data/en/mytool.md
-echo "## mytool comando..." >> internal/parser/data/it/mytool.md
-go build -v .
+**Enhanced Format with Descriptions:**
+
+```markdown
+## command name
+**Tags**: category, tool, action, context
+**Keywords**: searchable terms synonyms alternatives
+**Short_Description**: One-line summary of what the command does
+**Long_Description**: Detailed explanation including when to use it, what it does, important notes, and best practices.
+
+\`\`\`sh
+command example
+command --with-options
+\`\`\`
+```
+
+**Guidelines:**
+- **Short_Description**: Keep it brief (one line, <80 chars), focus on the main action
+- **Long_Description**: Provide context, explain when to use, mention important flags or behaviors
+- **Both fields are optional** but highly recommended for better user experience
+- **Backward compatible**: Old format (plain text description) still works
+
+**Example:**
+
+```markdown
+## docker ps
+**Tags**: docker, container, list, running, status
+**Keywords**: ps list containers running active status show
+**Short_Description**: List running containers
+**Long_Description**: Displays all currently running Docker containers with their status, names, and IDs. Use -a flag to show all containers including stopped ones. Essential for monitoring container health and status.
+
+\`\`\`sh
+docker ps
+docker ps -a
+docker ps --format "table {{.Names}}\t{{.Status}}"
+\`\`\`
 ```
 
 ## 🔍 How Search Works
