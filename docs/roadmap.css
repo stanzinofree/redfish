@@ -1,190 +1,195 @@
-/* kcsi Roadmap - Specific Styles */
+/* Redfish Roadmap - Dedicated Styles */
 
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #1a202c;
+    background: linear-gradient(135deg, #4c51bf 0%, #5a3e8f 100%);
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+/* Container */
 .container {
     max-width: 1200px;
-}
-
-.progress-summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 40px;
-    background: #f8f9fa;
-}
-
-.stat-card {
+    margin: 0 auto;
     background: white;
-    padding: 25px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 3rem;
 }
 
-.stat-card:hover {
-    transform: translateY(-5px);
+/* Typography */
+h1 {
+    color: #4c51bf; /* Changed from #667eea for better contrast (4.5:1) */
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
 }
 
-.stat-number {
-    font-size: 3em;
-    font-weight: bold;
-    background: linear-gradient(135deg, #4a5a9a 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.subtitle {
+    color: #4a5568; /* Changed from #666 for better contrast (7:1) */
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
 }
 
-.stat-label {
-    color: #495057;
-    font-size: 0.9em;
-    margin-top: 10px;
+/* Navigation */
+nav {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
 }
 
-.phase {
-    margin-bottom: 50px;
-    background: #f8f9fa;
-    border-radius: 15px;
-    padding: 30px;
-    position: relative;
-}
-
-.phase.completed {
-    background: #d4edda;
-    border-left: 5px solid #28a745;
-}
-
-.phase.in-progress {
-    background: #fff3cd;
-    border-left: 5px solid #ffc107;
-}
-
-.phase.pending {
-    background: #f8f9fa;
-    border-left: 5px solid #6c757d;
-}
-
-.phase-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.phase-title {
-    font-size: 1.8em;
-    color: #212529;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.phase-badge {
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-size: 0.7em;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.badge-completed {
-    background: #1e7e34;
-    color: white;
-}
-
-.badge-progress {
-    background: #ffc107;
-    color: #212529;
-}
-
-.badge-pending {
-    background: #6c757d;
-    color: white;
-}
-
-.progress-bar-container {
-    background: #e9ecef;
-    border-radius: 10px;
-    height: 10px;
-    margin: 10px 0;
-    overflow: hidden;
-}
-
-.progress-bar {
-    height: 100%;
-    background: #4a5a9a;
-    border-radius: 10px;
-    transition: width 0.3s ease;
-}
-
-.task-list {
-    list-style: none;
-    margin-top: 20px;
-}
-
-.task-item {
-    padding: 12px 0;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.task-item:last-child {
-    border-bottom: none;
-}
-
-.task-checkbox {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.task-checkbox.done {
-    background: #1e7e34;
-    color: white;
-}
-
-.task-checkbox.todo {
-    background: #e9ecef;
-    border: 2px solid #6c757d;
-}
-
-.task-text {
-    flex: 1;
-    color: #212529;
+nav a {
+    color: #4c51bf; /* Changed from #667eea for better contrast */
+    text-decoration: none;
+    margin-right: 1.5rem;
     font-weight: 500;
 }
 
-.task-text.done {
-    text-decoration: line-through;
-    color: #495057;
-    opacity: 1;
+nav a:hover {
+    text-decoration: underline;
+    color: #5a3e8f;
 }
 
-/* Override code styling for roadmap - use lighter style on light backgrounds */
-code {
-    background: #e9ecef;
-    color: #495057;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
+/* Phase Sections */
+.phase {
+    margin-bottom: 2.5rem;
 }
 
-/* Planned features section titles - improve contrast */
-.phase.pending h3 {
-    color: #212529 !important;
+.phase h2 {
+    color: #5a3e8f; /* Changed from #764ba2 for better contrast (4.6:1) */
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Phase Status Badges */
+.phase-status {
+    margin-left: 1rem;
+    font-size: 0.9rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
     font-weight: 600;
 }
 
-/* Footer styles moved to common.css */
+.phase-status.completed {
+    background: #c6f6d5;
+    color: #1a5632; /* Darker green for better contrast (7.3:1) */
+}
 
+.phase-status.in-progress {
+    background: #fef3c7;
+    color: #5f370e; /* Darker brown for better contrast (8.1:1) */
+}
+
+.phase-status.planned {
+    background: #e6e9ff; /* Lighter background for better contrast */
+    color: #3730a3; /* Darker indigo for better contrast (7.2:1) */
+}
+
+/* Lists */
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+li {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: #f7fafc;
+    border-left: 4px solid #4c51bf;
+    border-radius: 4px;
+    color: #2d3748; /* Darker text for better contrast */
+    transition: background-color 0.2s ease;
+}
+
+li:hover {
+    background: #edf2f7;
+}
+
+li.done {
+    border-left-color: #38a169; /* Better green contrast */
+    opacity: 0.8;
+}
+
+li.done::before {
+    content: "✓ ";
+    color: #22543d; /* Darker green for better contrast */
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+li.in-progress::before {
+    content: "⟳ ";
+    color: #d97706; /* Darker amber for better contrast (4.5:1) */
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+/* Footer */
+footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e2e8f0;
+    text-align: center;
+    color: #4a5568; /* Changed from #666 for better contrast */
+}
+
+footer p {
+    margin: 0.5rem 0;
+}
+
+footer a {
+    color: #4c51bf;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+footer a:hover {
+    text-decoration: underline;
+    color: #5a3e8f;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .progress-summary {
-        grid-template-columns: 1fr;
+    body {
+        padding: 1rem;
+    }
+
+    .container {
+        padding: 2rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .phase h2 {
+        font-size: 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .phase-status {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+
+    nav a {
+        display: block;
+        margin: 0.5rem 0;
     }
 }
