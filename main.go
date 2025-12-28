@@ -16,13 +16,18 @@ import (
 var (
 	showVersion = flag.Bool("v", false, "Show version information")
 	reloadCache = flag.Bool("r", false, "Reload cache from ~/.redfish custom cheatsheets")
-	_           = flag.String("l", "en", "Language for search (currently only 'en' supported)")
+	language    = flag.String("l", "en", "Language for search (supported: en, it)")
 	showHelp    = flag.Bool("h", false, "Show help message")
 )
 
 func main() {
 	// Parse flags
 	flag.Parse()
+
+	// Initialize cache directory on first run
+	if err := cache.EnsureCacheDir(); err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: could not initialize cache directory: %v\n", err)
+	}
 
 	// Handle flags
 	if *showHelp {
@@ -36,7 +41,7 @@ func main() {
 	}
 
 	if *reloadCache {
-		if err := rebuildCache(); err != nil {
+		if err := rebuildCache(*language); err != nil {
 			fmt.Fprintf(os.Stderr, "Error rebuilding cache: %v\n", err)
 			os.Exit(1)
 		}
@@ -54,7 +59,7 @@ func main() {
 	query := strings.Join(args, " ")
 
 	// Load commands (embedded + cached custom)
-	commands, err := loadAllCommands()
+	commands, err := loadAllCommands(*language)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error loading commands: %v\n", err)
 		os.Exit(1)
@@ -76,15 +81,15 @@ func main() {
 	}
 }
 
-func loadAllCommands() ([]parser.Command, error) {
-	// Load embedded commands
-	embedded, err := parser.LoadCommands()
+func loadAllCommands(lang string) ([]parser.Command, error) {
+	// Load embedded commands for the specified language
+	embedded, err := parser.LoadCommandsForLanguage(lang)
 	if err != nil {
 		return nil, err
 	}
 
-	// Try to load custom commands from cache
-	custom, err := cache.LoadCustomCheatsheets()
+	// Try to load custom commands from cache for the specified language
+	custom, err := cache.LoadCustomCheatsheetsForLanguage(lang)
 	if err != nil {
 		// Non-fatal: just use embedded commands
 		return embedded, nil
@@ -94,22 +99,22 @@ func loadAllCommands() ([]parser.Command, error) {
 	return append(embedded, custom...), nil
 }
 
-func rebuildCache() error {
+func rebuildCache(lang string) error {
 	// Clear existing cache
 	if err := cache.ClearCache(); err != nil {
 		return fmt.Errorf("clearing cache: %w", err)
 	}
 
-	// Load custom cheatsheets
-	custom, err := cache.LoadCustomCheatsheets()
+	// Load custom cheatsheets for the specified language
+	custom, err := cache.LoadCustomCheatsheetsForLanguage(lang)
 	if err != nil {
 		return fmt.Errorf("loading custom cheatsheets: %w", err)
 	}
 
 	if len(custom) == 0 {
 		cacheDir, _ := cache.GetCacheDir()
-		fmt.Printf("No custom cheatsheets found in %s\n", cacheDir)
-		fmt.Println("Add .md files there to include them in your searches")
+		fmt.Printf("No custom cheatsheets found in %s/%s/\n", cacheDir, lang)
+		fmt.Printf("Add .md files to %s/%s/ to include them in your searches\n", cacheDir, lang)
 		return nil
 	}
 
@@ -130,15 +135,17 @@ Examples:
   redfish git merge
   redfish git merge and delete branch
   redfish docker compose up
+  redfish -l it git
 
 Flags:
   -h    Show this help message
   -v    Show version information
   -r    Reload cache from ~/.redfish custom cheatsheets
-  -l    Language (default: en, currently only 'en' supported)
+  -l    Language (default: en, supported: en, it)
 
 Custom Cheatsheets:
-  Add your own .md files to ~/.redfish/ and run 'redfish -r' to include them`)
+  Add your own .md files to ~/.redfish/<lang>/ and run 'redfish -r -l <lang>' to include them
+  Example: Add Italian cheatsheets to ~/.redfish/it/`)
 }
 
 func printHelp() {
@@ -156,7 +163,8 @@ func printHelp() {
 	fmt.Println("  - Code matches (lowest priority)")
 	fmt.Println()
 	fmt.Println("Custom Cheatsheets Format:")
-	fmt.Println("  Create .md files in ~/.redfish/ with this format:")
+	fmt.Println("  Create .md files in ~/.redfish/<lang>/ with this format:")
+	fmt.Println("  (e.g., ~/.redfish/en/ for English, ~/.redfish/it/ for Italian)")
 	fmt.Println()
 	fmt.Println("  ## command name")
 	fmt.Println("  **Tags**: tag1, tag2, tag3")
@@ -167,6 +175,8 @@ func printHelp() {
 	fmt.Println("  ```sh")
 	fmt.Println("  command example")
 	fmt.Println("  ```")
+	fmt.Println()
+	fmt.Printf("Supported Languages: %v\n", cache.GetSupportedLanguages())
 	fmt.Println()
 	fmt.Printf("Repository: %s\n", version.GetManifest().Repository)
 	fmt.Printf("License: %s\n", version.GetManifest().License)

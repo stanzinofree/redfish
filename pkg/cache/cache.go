@@ -9,9 +9,13 @@ import (
 )
 
 const (
-	cacheDir  = ".redfish"
-	cacheFile = "commands.cache"
+	cacheDir          = ".redfish"
+	cacheFile         = "commands.cache"
+	defaultLanguage   = "en"
+	fallbackLanguage  = "en"
 )
+
+var supportedLanguages = []string{"en", "it"}
 
 // GetCacheDir returns the cache directory path
 func GetCacheDir() (string, error) {
@@ -31,13 +35,27 @@ func GetCachePath() (string, error) {
 	return filepath.Join(dir, cacheFile), nil
 }
 
-// EnsureCacheDir creates the cache directory if it doesn't exist
+// EnsureCacheDir creates the cache directory with language subdirectories if they don't exist
 func EnsureCacheDir() error {
 	dir, err := GetCacheDir()
 	if err != nil {
 		return err
 	}
-	return os.MkdirAll(dir, 0755)
+	
+	// Create main cache directory
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+	
+	// Create language subdirectories
+	for _, lang := range supportedLanguages {
+		langDir := filepath.Join(dir, lang)
+		if err := os.MkdirAll(langDir, 0755); err != nil {
+			return err
+		}
+	}
+	
+	return nil
 }
 
 // SaveCache saves commands to cache file
@@ -96,16 +114,22 @@ func ClearCache() error {
 	return nil
 }
 
-// LoadCustomCheatsheets loads markdown files from ~/.redfish/ directory
+// LoadCustomCheatsheets loads markdown files from ~/.redfish/<lang>/ directory for a specific language
 func LoadCustomCheatsheets() ([]parser.Command, error) {
-	dir, err := GetCacheDir()
+	return LoadCustomCheatsheetsForLanguage(defaultLanguage)
+}
+
+// LoadCustomCheatsheetsForLanguage loads markdown files for a specific language
+func LoadCustomCheatsheetsForLanguage(lang string) ([]parser.Command, error) {
+	baseDir, err := GetCacheDir()
 	if err != nil {
 		return nil, err
 	}
 
+	dir := filepath.Join(baseDir, lang)
 	var commands []parser.Command
 
-	// Read all .md files in the directory
+	// Read all .md files in the language directory
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -131,4 +155,9 @@ func LoadCustomCheatsheets() ([]parser.Command, error) {
 	}
 
 	return commands, nil
+}
+
+// GetSupportedLanguages returns list of supported language codes
+func GetSupportedLanguages() []string {
+	return supportedLanguages
 }

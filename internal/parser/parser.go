@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-//go:embed data/*.md
+//go:embed data/*/*.md
 var embeddedData embed.FS
 
 // Command represents a command with its metadata
@@ -18,12 +18,22 @@ type Command struct {
 	Code        string
 }
 
-// LoadCommands carica tutti i comandi dai file markdown embedded
+// LoadCommands loads all commands from embedded markdown files for a specific language
 func LoadCommands() ([]Command, error) {
+	return LoadCommandsForLanguage("en")
+}
+
+// LoadCommandsForLanguage loads commands for a specific language
+func LoadCommandsForLanguage(lang string) ([]Command, error) {
 	var commands []Command
 
-	entries, err := embeddedData.ReadDir("data")
+	langDir := "data/" + lang
+	entries, err := embeddedData.ReadDir(langDir)
 	if err != nil {
+		// Fallback to English if language not found
+		if lang != "en" {
+			return LoadCommandsForLanguage("en")
+		}
 		return nil, err
 	}
 
@@ -32,7 +42,7 @@ func LoadCommands() ([]Command, error) {
 			continue
 		}
 
-		content, err := embeddedData.ReadFile("data/" + entry.Name())
+		content, err := embeddedData.ReadFile(langDir + "/" + entry.Name())
 		if err != nil {
 			return nil, err
 		}
