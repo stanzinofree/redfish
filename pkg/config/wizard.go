@@ -10,7 +10,7 @@ import (
 // RunWizard runs the interactive configuration wizard
 func RunWizard() error {
 	reader := bufio.NewReader(os.Stdin)
-	
+
 	fmt.Println()
 	fmt.Println("╔═══════════════════════════════════════╗")
 	fmt.Println("║   🐟 Redfish Configuration Wizard    ║")
@@ -47,10 +47,10 @@ func RunWizard() error {
 	fmt.Println("Current settings:")
 	fmt.Printf("  Language: %s\n", newCfg.Language)
 	fmt.Println()
-	
+
 	configPath, _ := GetConfigPath()
 	fmt.Printf("Configuration file: %s\n", configPath)
-	
+
 	return nil
 }
 
@@ -74,7 +74,7 @@ func promptLanguage(reader *bufio.Reader, current string) string {
 	}
 
 	input = strings.TrimSpace(strings.ToLower(input))
-	
+
 	// If empty, keep current
 	if input == "" {
 		fmt.Printf("Keeping current value: %s\n", current)

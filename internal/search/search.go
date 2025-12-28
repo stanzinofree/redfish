@@ -15,14 +15,35 @@ type Result struct {
 
 // Search cerca comandi usando fuzzy matching
 func Search(commands []parser.Command, query string) []Result {
+	return SearchWithLanguage(commands, query, "en")
+}
+
+// SearchWithLanguage searches commands with language-aware stopword filtering
+func SearchWithLanguage(commands []parser.Command, query string, lang string) []Result {
 	tokens := tokenize(query)
 	if len(tokens) == 0 {
 		return nil
 	}
 
+	// Remove stopwords for more intelligent searching
+	filteredTokens := RemoveStopwords(tokens, lang)
+	
+	// Detect if this is a multi-token search (requires AND logic)
+	requireAll := len(filteredTokens) > 1
+
 	var results []Result
 	for _, cmd := range commands {
-		score := scoreCommand(cmd, tokens)
+		score := scoreCommand(cmd, filteredTokens)
+		
+		// For multi-token searches, require minimum coverage (AND logic)
+		if requireAll {
+			coverage := calculateCoverage(cmd, filteredTokens)
+			// Require at least 70% of tokens to match
+			if coverage < 0.7 {
+				continue
+			}
+		}
+		
 		if score > 0 {
 			results = append(results, Result{
 				Command: cmd,
@@ -31,7 +52,7 @@ func Search(commands []parser.Command, query string) []Result {
 		}
 	}
 
-	// Ordina per score decrescente
+	// Sort by score descending
 	sort.Slice(results, func(i, j int) bool {
 		return results[i].Score > results[j].Score
 	})

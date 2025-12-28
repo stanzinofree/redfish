@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	cacheDir          = ".redfish"
-	cacheFile         = "commands.cache"
-	defaultLanguage   = "en"
-	fallbackLanguage  = "en"
+	cacheDir         = ".redfish"
+	cacheFile        = "commands.cache"
+	defaultLanguage  = "en"
+	fallbackLanguage = "en"
 )
 
 var supportedLanguages = []string{"en", "it"}
@@ -41,12 +41,12 @@ func EnsureCacheDir() error {
 	if err != nil {
 		return err
 	}
-	
+
 	// Create main cache directory
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}
-	
+
 	// Create language subdirectories
 	for _, lang := range supportedLanguages {
 		langDir := filepath.Join(dir, lang)
@@ -54,7 +54,7 @@ func EnsureCacheDir() error {
 			return err
 		}
 	}
-	
+
 	return nil
 }
 
