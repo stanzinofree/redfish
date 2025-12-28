@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	configFile            = "config.yaml"
-	defaultLanguage       = "en"
+	configFile             = "config.yaml"
+	defaultLanguage        = "en"
 	defaultDescriptionMode = "short"
 )
 

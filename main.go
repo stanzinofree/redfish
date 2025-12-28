@@ -32,7 +32,7 @@ func main() {
 	cfg := loadConfigOrDefault()
 	selectedLang := determineLanguage(cfg)
 	selectedDescMode := determineDescriptionMode(cfg)
-	
+
 	if handleCommandFlags(selectedLang) {
 		return
 	}
